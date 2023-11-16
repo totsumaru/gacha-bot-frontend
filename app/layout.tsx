@@ -1,5 +1,6 @@
 import './globals.css'
 import React from "react";
+import { Providers } from "@/app/providers";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -14,15 +15,15 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="ja" className="">
-      <body className="">
-        <main className="">
+    <html lang="ja">
+      <body>
+        <Providers>
           {children}
-        </main>
+        </Providers>
       </body>
     </html>
-  )
+  );
 }
