@@ -1,57 +1,64 @@
-import DeployButton from '../components/DeployButton'
-import AuthButton from '../components/AuthButton'
-import { createClient } from '@/utils/supabase/server'
-import ConnectSupabaseSteps from '@/components/ConnectSupabaseSteps'
-import SignUpUserSteps from '@/components/SignUpUserSteps'
-import Header from '@/components/Header'
-import { cookies } from 'next/headers'
+import Footer from "@/components/Footer";
 
-export default async function Index() {
-  const cookieStore = cookies()
-
-  const canInitSupabaseClient = () => {
-    // This function is just for the interactive tutorial.
-    // Feel free to remove it once you have Supabase connected.
-    try {
-      createClient(cookieStore)
-      return true
-    } catch (e) {
-      return false
-    }
-  }
-
-  const isSupabaseConnected = canInitSupabaseClient()
-
+export default function Example() {
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <DeployButton />
-          {isSupabaseConnected && <AuthButton />}
-        </div>
-      </nav>
-
-      <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-        <Header />
-        <main className="flex-1 flex flex-col gap-6">
-          <h2 className="font-bold text-4xl mb-4">Next steps</h2>
-          {isSupabaseConnected ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-        </main>
-      </div>
-
-      <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
-        <p>
-          Powered by{' '}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
+    <div className="relative isolate overflow-hidden bg-white">
+      <svg
+        className="absolute inset-0 -z-10 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
+        aria-hidden="true"
+      >
+        <defs>
+          <pattern
+            id="0787a7c5-978c-4f66-83c7-11c213f99cb7"
+            width={200}
+            height={200}
+            x="50%"
+            y={-1}
+            patternUnits="userSpaceOnUse"
           >
-            Supabase
-          </a>
-        </p>
-      </footer>
+            <path d="M.5 200V.5H200" fill="none"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" strokeWidth={0} fill="url(#0787a7c5-978c-4f66-83c7-11c213f99cb7)"/>
+      </svg>
+      <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:py-40">
+        <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0 lg:pt-8">
+          <h2 className="text-lg font-bold">Gacha-botで</h2>
+          <h1 className="mt-7 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            ガチャを回そう！
+          </h1>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            Discordでガチャガチャができるbotです。Discordのアクティブ率をあげるためにも、ぜひ使ってみてください！
+          </p>
+          <div className="mt-10 flex items-center gap-x-6">
+            <a
+              href="#"
+              className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Get started
+            </a>
+            <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+              Learn more <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+        <div
+          className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
+          <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
+            <div
+              className="-m-2 rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
+              <img
+                src="/top.png"
+                alt="App screenshot"
+                width={2432}
+                height={1442}
+                className="w-[76rem] rounded-md shadow-2xl ring-1 ring-gray-900/10"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <Footer/>
     </div>
   )
 }
