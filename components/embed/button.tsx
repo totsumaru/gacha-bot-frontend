@@ -22,6 +22,9 @@ type Props = {
   setColor: (color: string) => void
 }
 
+/**
+ * ボタンの設定を行うDrawer
+ */
 export default function ButtonDrawer({ label, setLabel, color, setColor }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = useRef<HTMLButtonElement>(null);
