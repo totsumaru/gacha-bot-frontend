@@ -8,8 +8,8 @@ type Props = {
   setTitle: (title: string) => void;
   description: string;
   setDescription: (description: string) => void;
-  image: string;
-  setImage: (image: string) => void;
+  file: File | null;
+  setFile: (file: File | null) => void;
   buttonLabel?: string;
   setButtonLabel?: (buttonLabel: string) => void;
   buttonColor?: string;
@@ -26,16 +26,16 @@ function DiscordEmbedUI(props: Props) {
   const placeholderColor = 'gray.500'; // プレースホルダーのカラー
 
   // 画像を変更します
-  const handleImageChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      props.setImage(URL.createObjectURL(file));
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      props.setFile(file); // Fileオブジェクトを設定
     }
   };
 
   // 画像を削除します
   const handleImageDelete = () => {
-    props.setImage('');
+    props.setFile(null); // Fileオブジェクトをnullに設定
   };
 
   return (
@@ -85,8 +85,12 @@ function DiscordEmbedUI(props: Props) {
               cursor="pointer"
               onChange={handleImageChange}
             />
-            {props.image ? (
-              <Image src={props.image} alt="Uploaded image" borderRadius="md"/>
+            {props.file ? (
+              <Image
+                src={URL.createObjectURL(props.file)}
+                alt="Uploaded image"
+                borderRadius="md"
+              />
             ) : (
               <Center p={12}>
                 クリックして画像を選択
@@ -95,7 +99,7 @@ function DiscordEmbedUI(props: Props) {
           </Box>
 
           {/* Delete Image Icon */}
-          {props.image && (
+          {props.file && (
             <IconButton
               icon={<FaTrashAlt/>}
               aria-label="Delete image"

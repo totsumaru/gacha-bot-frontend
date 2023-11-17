@@ -1,38 +1,97 @@
 "use client"
 
-import { Box, Container, Flex, IconButton, NumberInput, NumberInputField, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  IconButton,
+  NumberInput,
+  NumberInputField,
+  Spinner,
+  Text,
+  useToast
+} from '@chakra-ui/react'
 import Header from "@/components/Header";
 import React, { useState } from "react";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { FaPlus, FaTrash } from "react-icons/fa";
+import { uploadImages } from "@/utils/api/body";
 
 type EmbedUIState = {
   key: number;
   title: string;
   description: string;
-  image: string;
+  image: File | null;
   buttonLabel: string;
   buttonColor: string;
   probability: number;
   points: number;
 };
 
-export default function Client() {
+type Props = {
+  id: string
+  serverId: string
+}
+
+export default function Client(props: Props) {
+  const [id, setId] = useState(props.id);
   // パネル
   const [panelTitle, setPanelTitle] = useState<string>("")
   const [panelDescription, setPanelDescription] = useState<string>("")
-  const [panelImage, setPanelImage] = useState<string>("")
+  const [panelImage, setPanelImage] = useState<File | null>(null)
   const [panelButtonLabel, setPanelButtonLabel] = useState<string>("ガチャを引く")
   const [panelButtonColor, setPanelButtonColor] = useState<string>("blue")
   // Open
   const [openTitle, setOpenTitle] = useState<string>("")
   const [openDescription, setOpenDescription] = useState<string>("")
-  const [openImage, setOpenImage] = useState<string>("")
+  const [openImage, setOpenImage] = useState<File | null>(null)
   const [openButtonLabel, setOpenButtonLabel] = useState<string>("OPEN")
   const [openButtonColor, setOpenButtonColor] = useState<string>("blue")
-  const [embedUIs, setEmbedUIs] = useState<EmbedUIState[]>([
-    { key: 0, title: "", description: "", image: "", buttonLabel: "ガチャを引く", buttonColor: "blue", probability: 0, points: 0 }
-  ]);
+  const [embedUIs, setEmbedUIs] = useState<EmbedUIState[]>([{
+    key: 0,
+    title: "",
+    description: "",
+    image: null,
+    buttonLabel: "",
+    buttonColor: "blue",
+    probability: 0,
+    points: 0
+  }]);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
+
+  // 保存ボタンをクリックした時の処理です
+  const handleSave = async () => {
+    setIsLoading(true);
+
+    try {
+      // すべての画像ファイルを配列にまとめる
+      const allImageFiles = [
+        panelImage, // Fileオブジェクト
+        openImage,  // Fileオブジェクト
+        ...embedUIs.map(ui => ui.image) // 各EmbedUIのFileオブジェクト
+      ].filter(file => file != null); // nullでないファイルのみをフィルタリング
+
+      // Fileオブジェクトの配列をアップロードする
+      const uploadedImageUrls = await uploadImages(allImageFiles as File[]);
+
+      console.log("Uploaded Image URLs:", uploadedImageUrls);
+
+      // その他のリクエスト処理...
+      // 省略
+    } catch (error) {
+      console.error("画像のアップロードまたは保存に失敗しました:", error);
+      toast({
+        title: "画像のアップロードまたは保存に失敗しました",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const addEmbedUI = () => {
     if (embedUIs.length < 10) { // MAXは10
@@ -41,7 +100,7 @@ export default function Client() {
         key: newKey,
         title: "",
         description: "",
-        image: "",
+        image: null,
         buttonLabel: "ガチャを引く",
         buttonColor: "blue",
         probability: 0,
@@ -71,21 +130,9 @@ export default function Client() {
     setEmbedUIs(updatedEmbedUIs);
   };
 
-  const updateEmbedUIImage = (index: number, image: string) => {
+  const updateEmbedUIImage = (index: number, image: File | null) => {
     const updatedEmbedUIs = [...embedUIs];
     updatedEmbedUIs[index].image = image;
-    setEmbedUIs(updatedEmbedUIs);
-  };
-
-  const updateEmbedUIButtonLabel = (index: number, buttonLabel: string) => {
-    const updatedEmbedUIs = [...embedUIs];
-    updatedEmbedUIs[index].buttonLabel = buttonLabel;
-    setEmbedUIs(updatedEmbedUIs);
-  };
-
-  const updateEmbedUIButtonColor = (index: number, buttonColor: string) => {
-    const updatedEmbedUIs = [...embedUIs];
-    updatedEmbedUIs[index].buttonColor = buttonColor;
     setEmbedUIs(updatedEmbedUIs);
   };
 
@@ -119,8 +166,8 @@ export default function Client() {
           setTitle={(title) => setPanelTitle(title)}
           description={panelDescription}
           setDescription={(description) => setPanelDescription(description)}
-          image={panelImage}
-          setImage={(image) => setPanelImage(image)}
+          file={panelImage}
+          setFile={(image) => setPanelImage(image)}
           buttonLabel={panelButtonLabel}
           setButtonLabel={(buttonLabel) => setPanelButtonLabel(buttonLabel)}
           buttonColor={panelButtonColor}
@@ -137,8 +184,8 @@ export default function Client() {
           setTitle={(title) => setOpenTitle(title)}
           description={openDescription}
           setDescription={(description) => setOpenDescription(description)}
-          image={openImage}
-          setImage={(image) => setOpenImage(image)}
+          file={openImage}
+          setFile={(image) => setOpenImage(image)}
           buttonLabel={openButtonLabel}
           setButtonLabel={(buttonLabel) => setOpenButtonLabel(buttonLabel)}
           buttonColor={openButtonColor}
@@ -154,7 +201,7 @@ export default function Client() {
         </Text>
 
         {/* EmbedUIの追加と表示 */}
-        <Flex overflowX="scroll">
+        <Flex overflowX="scroll" pb={3}>
           {embedUIs.map((embedUI, index) => (
             <Box key={index} mx={2} minWidth="300px">
               <DiscordEmbedUI
@@ -162,10 +209,10 @@ export default function Client() {
                 setTitle={(title) => updateEmbedUITitle(index, title)}
                 description={embedUI.description}
                 setDescription={(description) => updateEmbedUIDescription(index, description)}
-                image={embedUI.image}
-                setImage={(image) => updateEmbedUIImage(index, image)}
+                file={embedUI.image}
+                setFile={(image) => updateEmbedUIImage(index, image)}
               />
-              <Flex direction="column" mt={2} pb={5}>
+              <Flex direction="column" mt={2} pb={1}>
                 <Flex alignItems="center">
                   <Text mr={2}>確率:</Text>
                   <NumberInput
@@ -220,6 +267,19 @@ export default function Client() {
           )}
         </Flex>
         <Text fontWeight="bold" mt={3}>確率の合計: {totalProbability}%</Text>
+
+        <Flex justifyContent="flex-end" mt={3}>
+          <Button
+            colorScheme="teal"
+            onClick={handleSave}
+            isLoading={isLoading}
+            loadingText="保存中"
+            spinner={<Spinner size="sm"/>}
+            disabled={isLoading}
+          >
+            保存する
+          </Button>
+        </Flex>
 
       </Container>
     </>
