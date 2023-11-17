@@ -10,10 +10,10 @@ type Props = {
   setDescription: (description: string) => void;
   image: string;
   setImage: (image: string) => void;
-  buttonLabel: string;
-  setButtonLabel: (buttonLabel: string) => void;
-  buttonColor: string;
-  setButtonColor: (buttonColor: string) => void;
+  buttonLabel?: string;
+  setButtonLabel?: (buttonLabel: string) => void;
+  buttonColor?: string;
+  setButtonColor?: (buttonColor: string) => void;
 }
 
 /**
@@ -109,15 +109,16 @@ function DiscordEmbedUI(props: Props) {
         </Box>
 
         {/* 'ガチャを引く' Button */}
-        <HStack justifyContent="flex-start">
-          <ButtonDrawer
-            label={props.buttonLabel}
-            setLabel={(label) => props.setButtonLabel(label)}
-            color={props.buttonColor}
-            setColor={(color) => props.setButtonColor(color)}
-          />
-        </HStack>
-
+        {props.buttonLabel && props.buttonColor && (
+          <HStack justifyContent="flex-start">
+            <ButtonDrawer
+              label={props.buttonLabel}
+              setLabel={(label) => props.setButtonLabel!(label)}
+              color={props.buttonColor}
+              setColor={(color) => props.setButtonColor!(color)}
+            />
+          </HStack>
+        )}
       </VStack>
     </Box>
   );
