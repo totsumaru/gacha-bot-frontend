@@ -1,19 +1,20 @@
 import React from 'react';
 import { Box, Center, HStack, IconButton, Image, Input, Textarea, VStack } from '@chakra-ui/react';
-import ButtonDrawer from "@/components/embed/Button";
+import ButtonDrawer from "@/components/embed/ButtonDrawer";
 import { FaTrashAlt } from "react-icons/fa";
+import { ButtonStyle } from "@/utils/api/body";
 
 type Props = {
   title: string;
   setTitle: (title: string) => void;
   description: string;
   setDescription: (description: string) => void;
-  file: File | null;
+  file: string | File | null;
   setFile: (file: File | null) => void;
   buttonLabel?: string;
   setButtonLabel?: (buttonLabel: string) => void;
-  buttonColor?: string;
-  setButtonColor?: (buttonColor: string) => void;
+  buttonStyle?: ButtonStyle;
+  setButtonStyle?: (buttonColor: ButtonStyle) => void;
 }
 
 /**
@@ -87,7 +88,7 @@ function DiscordEmbedUI(props: Props) {
             />
             {props.file ? (
               <Image
-                src={URL.createObjectURL(props.file)}
+                src={typeof props.file === 'string' ? props.file : URL.createObjectURL(props.file)}
                 alt="Uploaded image"
                 borderRadius="md"
               />
@@ -113,13 +114,13 @@ function DiscordEmbedUI(props: Props) {
         </Box>
 
         {/* 'ガチャを引く' Button */}
-        {props.buttonLabel && props.buttonColor && (
+        {props.buttonLabel && props.buttonStyle && (
           <HStack justifyContent="flex-start">
             <ButtonDrawer
               label={props.buttonLabel}
               setLabel={(label) => props.setButtonLabel!(label)}
-              color={props.buttonColor}
-              setColor={(color) => props.setButtonColor!(color)}
+              style={props.buttonStyle}
+              setStyle={(color) => props.setButtonStyle!(color)}
             />
           </HStack>
         )}

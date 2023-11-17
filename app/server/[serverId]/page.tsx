@@ -1,6 +1,7 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import Client from "@/app/server/[serverId]/Client";
+import { getGacha } from "@/utils/api/get_gacha";
 
 export default async function Index({
   params: { serverId }
@@ -10,9 +11,17 @@ export default async function Index({
   const supabase = createServerComponentClient({ cookies })
   const { data: { session } } = await supabase.auth.getSession()
 
+  const gacha = await getGacha(serverId)
+
   return (
     <>
-      <Client id={"bd8184c6-13da-4981-93de-d6da444c347a"} serverId={"984614055681613864"}/>
+      <Client
+        id={gacha.id}
+        server_id={serverId}
+        panel={gacha.panel}
+        open={gacha.open}
+        result={gacha.result}
+      />
     </>
   )
 }

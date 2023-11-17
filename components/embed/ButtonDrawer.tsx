@@ -14,22 +14,32 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 import { FaCircle } from 'react-icons/fa';
+import { ButtonStyle } from "@/utils/api/body";
+
+const btnStyleToColor = (style: ButtonStyle) => {
+  switch (style) {
+    case "PRIMARY":
+      return "blue";
+    case "SUCCESS":
+      return "green";
+  }
+}
 
 type Props = {
   label: string,
   setLabel: (label: string) => void,
-  color: string,
-  setColor: (color: string) => void
+  style: ButtonStyle,
+  setStyle: (style: ButtonStyle) => void
 }
 
 /**
  * ボタンの設定を行うDrawer
  */
-export default function ButtonDrawer({ label, setLabel, color, setColor }: Props) {
+export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = useRef<HTMLButtonElement>(null);
   const [newLabel, setNewLabel] = useState(label);
-  const [newColor, setNewColor] = useState(color);
+  const [newStyle, setNewStyle] = useState(style);
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewLabel(e.target.value);
@@ -37,17 +47,17 @@ export default function ButtonDrawer({ label, setLabel, color, setColor }: Props
 
   const handleSave = () => {
     setLabel(newLabel);
-    setColor(newColor);
+    setStyle(newStyle);
     onClose();
   };
 
   const isSelectedColor = (testColor: string) => {
-    return newColor === testColor ? 'outline' : 'ghost';
+    return newStyle === testColor ? 'outline' : 'ghost';
   };
 
   return (
     <>
-      <Button ref={btnRef} colorScheme={color} onClick={onOpen}>
+      <Button ref={btnRef} colorScheme={btnStyleToColor(style)} onClick={onOpen}>
         {label}
       </Button>
       <Drawer
@@ -69,14 +79,14 @@ export default function ButtonDrawer({ label, setLabel, color, setColor }: Props
                 icon={<FaCircle/>}
                 colorScheme="blue"
                 variant={isSelectedColor('blue')}
-                onClick={() => setNewColor('blue')}
+                onClick={() => setNewStyle('PRIMARY')}
               />
               <IconButton
                 aria-label="Success color"
                 icon={<FaCircle/>}
                 colorScheme="green"
                 variant={isSelectedColor('green')}
-                onClick={() => setNewColor('green')}
+                onClick={() => setNewStyle('SUCCESS')}
               />
             </HStack>
           </DrawerBody>

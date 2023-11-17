@@ -13,15 +13,15 @@ import {
   useToast
 } from '@chakra-ui/react'
 import Header from "@/components/Header";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { GachaReq } from "@/utils/api/body";
+import { ButtonStyle, GachaReq, GachaRes } from "@/utils/api/body";
 import { uploadImages } from "@/utils/api/upload_images";
 import { upsertGacha } from "@/utils/api/upsert_gacha";
+import { usePanelStore } from "@/utils/store/gachaStore";
 
 type ResultEmbedUIState = {
-  key: number;
   title: string;
   description: string;
   image: File | null;
@@ -29,26 +29,24 @@ type ResultEmbedUIState = {
   points: number;
 };
 
-type Props = {
-  id: string
-  serverId: string
-}
+export default function Client(props: GachaRes) {
+  const panelStore = usePanelStore();
 
-export default function Client(props: Props) {
-  // パネル
-  const [panelTitle, setPanelTitle] = useState<string>("")
-  const [panelDescription, setPanelDescription] = useState<string>("")
-  const [panelImage, setPanelImage] = useState<File | null>(null)
-  const [panelButtonLabel, setPanelButtonLabel] = useState<string>("ガチャを引く")
-  const [panelButtonColor, setPanelButtonColor] = useState<string>("blue")
+  useEffect(() => {
+    panelStore.init(props.panel);
+  }, []);
+
   // Open
-  const [openTitle, setOpenTitle] = useState<string>("")
-  const [openDescription, setOpenDescription] = useState<string>("")
+  const [openTitle, setOpenTitle] = useState<string>(props.open.title || "")
+  const [openDescription, setOpenDescription] = useState<string>(props.open.description || "")
   const [openImage, setOpenImage] = useState<File | null>(null)
-  const [openButtonLabel, setOpenButtonLabel] = useState<string>("OPEN")
-  const [openButtonColor, setOpenButtonColor] = useState<string>("blue")
+  const [openButtonLabel, setOpenButtonLabel] = useState<string>(
+    props.open.button[0].label || "OPEN"
+  )
+  const [openButtonStyle, setOpenButtonStyle] = useState<ButtonStyle>(
+    props.panel.button[0].style
+  )
   const [embedUIs, setEmbedUIs] = useState<ResultEmbedUIState[]>([{
-    key: 0,
     title: "",
     description: "",
     image: null,
@@ -65,7 +63,7 @@ export default function Client(props: Props) {
     try {
       // 画像をアップロード
       const allImageFiles = [
-        panelImage,
+        panelStore.image,
         openImage,
         ...embedUIs.map(ui => ui.image),
       ].filter(file => file != null);
@@ -78,17 +76,17 @@ export default function Client(props: Props) {
       // APIリクエストに必要なデータを準備
       const requestData: GachaReq = {
         id: props.id,
-        server_id: props.serverId,
+        server_id: props.server_id,
         panel: {
-          title: panelTitle,
-          description: panelDescription,
+          title: panelStore.title,
+          description: panelStore.description,
           color: 0,
           image_url: uploadedImageUrls[0],
           thumbnail_url: "",
           button: [{
             kind: "to_open",
-            label: panelButtonLabel,
-            style: "PRIMARY",
+            label: panelStore.button.label,
+            style: panelStore.button.style,
           }],
         },
         open: {
@@ -142,9 +140,7 @@ export default function Client(props: Props) {
   // ResultのEmbedを追加します
   const addResultEmbedUI = () => {
     if (embedUIs.length < 10) { // MAXは10
-      const newKey = embedUIs.length;
       const newEmbedUI: ResultEmbedUIState = {
-        key: newKey,
         title: "",
         description: "",
         image: null,
@@ -207,16 +203,16 @@ export default function Client(props: Props) {
           常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
         </Text>
         <DiscordEmbedUI
-          title={panelTitle}
-          setTitle={(title) => setPanelTitle(title)}
-          description={panelDescription}
-          setDescription={(description) => setPanelDescription(description)}
-          file={panelImage}
-          setFile={(image) => setPanelImage(image)}
-          buttonLabel={panelButtonLabel}
-          setButtonLabel={(buttonLabel) => setPanelButtonLabel(buttonLabel)}
-          buttonColor={panelButtonColor}
-          setButtonColor={(buttonColor) => setPanelButtonColor(buttonColor)}
+          title={panelStore.title}
+          setTitle={(title) => panelStore.setTitle(title)}
+          description={panelStore.description}
+          setDescription={(description) => panelStore.setDescription(description)}
+          file={panelStore.image}
+          setFile={(image) => panelStore.setImage(image)}
+          buttonLabel={panelStore.button.label}
+          setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
+          buttonStyle={panelStore.button.style}
+          setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
         />
 
         {/* Open */}
@@ -233,8 +229,8 @@ export default function Client(props: Props) {
           setFile={(image) => setOpenImage(image)}
           buttonLabel={openButtonLabel}
           setButtonLabel={(buttonLabel) => setOpenButtonLabel(buttonLabel)}
-          buttonColor={openButtonColor}
-          setButtonColor={(buttonColor) => setOpenButtonColor(buttonColor)}
+          buttonStyle={openButtonStyle}
+          setButtonStyle={(buttonColor) => setOpenButtonStyle(buttonColor)}
         />
 
         {/* Result */}

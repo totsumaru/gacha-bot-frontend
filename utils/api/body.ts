@@ -5,6 +5,15 @@
 export type ButtonKind = "to_open" | "to_result"
 export type ButtonStyle = "PRIMARY" | "SUCCESS"
 
+// ガチャのレスポンス
+export interface GachaRes {
+  id: string;
+  server_id: string;
+  panel: EmbedReq;
+  open: EmbedReq
+  result: ResultReq[];
+}
+
 // ガチャのリクエスト
 export interface GachaReq {
   id: string;
