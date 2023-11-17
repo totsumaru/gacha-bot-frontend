@@ -16,15 +16,15 @@ import Header from "@/components/Header";
 import React, { useState } from "react";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { uploadImages } from "@/utils/api/body";
+import { GachaReq } from "@/utils/api/body";
+import { uploadImages } from "@/utils/api/upload_images";
+import { upsertGacha } from "@/utils/api/upsert_gacha";
 
-type EmbedUIState = {
+type ResultEmbedUIState = {
   key: number;
   title: string;
   description: string;
   image: File | null;
-  buttonLabel: string;
-  buttonColor: string;
   probability: number;
   points: number;
 };
@@ -35,7 +35,6 @@ type Props = {
 }
 
 export default function Client(props: Props) {
-  const [id, setId] = useState(props.id);
   // パネル
   const [panelTitle, setPanelTitle] = useState<string>("")
   const [panelDescription, setPanelDescription] = useState<string>("")
@@ -48,13 +47,11 @@ export default function Client(props: Props) {
   const [openImage, setOpenImage] = useState<File | null>(null)
   const [openButtonLabel, setOpenButtonLabel] = useState<string>("OPEN")
   const [openButtonColor, setOpenButtonColor] = useState<string>("blue")
-  const [embedUIs, setEmbedUIs] = useState<EmbedUIState[]>([{
+  const [embedUIs, setEmbedUIs] = useState<ResultEmbedUIState[]>([{
     key: 0,
     title: "",
     description: "",
     image: null,
-    buttonLabel: "",
-    buttonColor: "blue",
     probability: 0,
     points: 0
   }]);
@@ -66,22 +63,71 @@ export default function Client(props: Props) {
     setIsLoading(true);
 
     try {
-      // すべての画像ファイルを配列にまとめる
+      // 画像をアップロード
       const allImageFiles = [
-        panelImage, // Fileオブジェクト
-        openImage,  // Fileオブジェクト
-        ...embedUIs.map(ui => ui.image) // 各EmbedUIのFileオブジェクト
-      ].filter(file => file != null); // nullでないファイルのみをフィルタリング
+        panelImage,
+        openImage,
+        ...embedUIs.map(ui => ui.image),
+      ].filter(file => file != null);
 
-      // Fileオブジェクトの配列をアップロードする
-      const uploadedImageUrls = await uploadImages(allImageFiles as File[]);
+      let uploadedImageUrls: string[] = [];
+      if (allImageFiles.length !== 0) {
+        uploadedImageUrls = await uploadImages(allImageFiles as File[]);
+      }
 
-      console.log("Uploaded Image URLs:", uploadedImageUrls);
+      // APIリクエストに必要なデータを準備
+      const requestData: GachaReq = {
+        id: props.id,
+        server_id: props.serverId,
+        panel: {
+          title: panelTitle,
+          description: panelDescription,
+          color: 0,
+          image_url: uploadedImageUrls[0],
+          thumbnail_url: "",
+          button: [{
+            kind: "to_open",
+            label: panelButtonLabel,
+            style: "PRIMARY",
+          }],
+        },
+        open: {
+          title: openTitle,
+          description: openDescription,
+          color: 0,
+          image_url: uploadedImageUrls[1],
+          thumbnail_url: "",
+          button: [{
+            kind: "to_result",
+            label: openButtonLabel,
+            style: "SUCCESS",
+          }],
+        },
+        result: embedUIs.map((ui, index) => ({
+          embed: {
+            title: ui.title,
+            description: ui.description,
+            color: 0,
+            image_url: uploadedImageUrls[index + 2],
+            thumbnail_url: "",
+            button: [],
+          },
+          point: ui.points,
+          probability: ui.probability,
+        }))
+      };
 
-      // その他のリクエスト処理...
-      // 省略
+      // APIリクエストを送信
+      await upsertGacha(requestData)
+
+      toast({
+        title: "ガチャの設定が保存されました",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
-      console.error("画像のアップロードまたは保存に失敗しました:", error);
+      console.error("エラーが発生しました", error);
       toast({
         title: "画像のアップロードまたは保存に失敗しました",
         status: "error",
@@ -93,16 +139,15 @@ export default function Client(props: Props) {
     }
   };
 
-  const addEmbedUI = () => {
+  // ResultのEmbedを追加します
+  const addResultEmbedUI = () => {
     if (embedUIs.length < 10) { // MAXは10
       const newKey = embedUIs.length;
-      const newEmbedUI: EmbedUIState = {
+      const newEmbedUI: ResultEmbedUIState = {
         key: newKey,
         title: "",
         description: "",
         image: null,
-        buttonLabel: "ガチャを引く",
-        buttonColor: "blue",
         probability: 0,
         points: 0,
       };
@@ -259,7 +304,7 @@ export default function Client(props: Props) {
             <IconButton
               aria-label="Add Embed UI"
               icon={<FaPlus/>}
-              onClick={addEmbedUI}
+              onClick={addResultEmbedUI}
               alignSelf="center"
               bg="teal"
               textColor="white"

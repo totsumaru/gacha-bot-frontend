@@ -12,7 +12,7 @@ export default async function Index({
 
   return (
     <>
-      <Client/>
+      <Client id={"bd8184c6-13da-4981-93de-d6da444c347a"} serverId={"984614055681613864"}/>
     </>
   )
 }
