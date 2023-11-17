@@ -51,8 +51,8 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
     onClose();
   };
 
-  const isSelectedColor = (testColor: string) => {
-    return newStyle === testColor ? 'outline' : 'ghost';
+  const isSelectedStyle = (style: ButtonStyle) => {
+    return newStyle === style ? 'outline' : 'ghost';
   };
 
   return (
@@ -78,14 +78,14 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
                 aria-label="Primary color"
                 icon={<FaCircle/>}
                 colorScheme="blue"
-                variant={isSelectedColor('blue')}
+                variant={isSelectedStyle('PRIMARY')}
                 onClick={() => setNewStyle('PRIMARY')}
               />
               <IconButton
                 aria-label="Success color"
                 icon={<FaCircle/>}
                 colorScheme="green"
-                variant={isSelectedColor('green')}
+                variant={isSelectedStyle('SUCCESS')}
                 onClick={() => setNewStyle('SUCCESS')}
               />
             </HStack>
