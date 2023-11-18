@@ -12,14 +12,13 @@ import {
   Text,
   useToast
 } from '@chakra-ui/react'
-import Header from "@/components/Header";
 import React, { useEffect, useState } from "react";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { GachaReq, GachaRes } from "@/utils/api/body";
 import { uploadImages } from "@/utils/api/upload_images";
 import { upsertGacha } from "@/utils/api/upsert_gacha";
-import { resultStore, useOpenStore, usePanelStore, useResultStore } from "@/utils/store/gachaStore";
+import { useOpenStore, usePanelStore, useResultStore } from "@/utils/store/gachaStore";
 
 /**
  * クライアントの処理を行います
@@ -212,136 +211,133 @@ export default function Client(props: GachaRes) {
   };
 
   return (
-    <>
-      <Header/>
-      <Container mt={10} pb={20}>
-        {/* パネル */}
-        <Text fontSize='xl' fontWeight="bold">1. Panel</Text>
-        <Text fontSize='base' mb={3}>
-          常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
-        </Text>
-        <DiscordEmbedUI
-          title={panelStore.title}
-          setTitle={(title) => panelStore.setTitle(title)}
-          description={panelStore.description}
-          setDescription={(description) => panelStore.setDescription(description)}
-          file={panelStore.image}
-          setFile={(image) => panelStore.setImage(image)}
-          buttonLabel={panelStore.button.label}
-          setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
-          buttonStyle={panelStore.button.style}
-          setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
-        />
+    <Container mt={10} pb={20}>
+      {/* パネル */}
+      <Text fontSize='xl' fontWeight="bold">1. Panel</Text>
+      <Text fontSize='base' mb={3}>
+        常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
+      </Text>
+      <DiscordEmbedUI
+        title={panelStore.title}
+        setTitle={(title) => panelStore.setTitle(title)}
+        description={panelStore.description}
+        setDescription={(description) => panelStore.setDescription(description)}
+        file={panelStore.image}
+        setFile={(image) => panelStore.setImage(image)}
+        buttonLabel={panelStore.button.label}
+        setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
+        buttonStyle={panelStore.button.style}
+        setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
+      />
 
-        {/* Open */}
-        <Text fontSize='xl' mt={5} fontWeight="bold">2. Open</Text>
-        <Text fontSize='base' mb={3}>
-          Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
-        </Text>
-        <DiscordEmbedUI
-          title={openStore.title}
-          setTitle={(title) => openStore.setTitle(title)}
-          description={openStore.description}
-          setDescription={(description) => openStore.setDescription(description)}
-          file={openStore.image}
-          setFile={(image) => openStore.setImage(image)}
-          buttonLabel={openStore.button.label}
-          setButtonLabel={(buttonLabel) => openStore.setButtonLabel(buttonLabel)}
-          buttonStyle={openStore.button.style}
-          setButtonStyle={(buttonColor) => openStore.setButtonStyle(buttonColor)}
-        />
+      {/* Open */}
+      <Text fontSize='xl' mt={5} fontWeight="bold">2. Open</Text>
+      <Text fontSize='base' mb={3}>
+        Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
+      </Text>
+      <DiscordEmbedUI
+        title={openStore.title}
+        setTitle={(title) => openStore.setTitle(title)}
+        description={openStore.description}
+        setDescription={(description) => openStore.setDescription(description)}
+        file={openStore.image}
+        setFile={(image) => openStore.setImage(image)}
+        buttonLabel={openStore.button.label}
+        setButtonLabel={(buttonLabel) => openStore.setButtonLabel(buttonLabel)}
+        buttonStyle={openStore.button.style}
+        setButtonStyle={(buttonColor) => openStore.setButtonStyle(buttonColor)}
+      />
 
-        {/* Result */}
-        <Text fontSize='xl' mt={5} fontWeight="bold">3. Result</Text>
-        <Text fontSize='base' mb={3}>
-          当たり/ハズレなどの結果発表です。登録されたものの中からランダムで表示されます。
-          それぞれの表示確率を設定できますが、<b>全ての合計が「100(%)」</b>になるようにしてください。
-          ポイントは、その結果になった時に得られるポイントです。
-        </Text>
+      {/* Result */}
+      <Text fontSize='xl' mt={5} fontWeight="bold">3. Result</Text>
+      <Text fontSize='base' mb={3}>
+        当たり/ハズレなどの結果発表です。登録されたものの中からランダムで表示されます。
+        それぞれの表示確率を設定できますが、<b>全ての合計が「100(%)」</b>になるようにしてください。
+        ポイントは、その結果になった時に得られるポイントです。
+      </Text>
 
-        {/* EmbedUIの追加と表示 */}
-        <Flex overflowX="scroll" pb={3}>
-          {resultStore.results.map((res, index) => (
-            <Box key={index} mx={2} minWidth="300px">
-              <DiscordEmbedUI
-                title={res.title}
-                setTitle={(title) => resultStore.setTitle(index, title)}
-                description={res.description}
-                setDescription={(description) => resultStore.setDescription(index, description)}
-                file={res.image}
-                setFile={(image) => resultStore.setImage(index, image)}
-                // 確率とポイントの更新関数
-              />
-              <Flex direction="column" mt={2} pb={1}>
-                <Flex alignItems="center">
-                  <Text mr={2}>確率:</Text>
-                  <NumberInput
-                    placeholder="確率"
-                    value={res.probability}
-                    onChange={(e) => updateEmbedUIProbability(index, Number(e))}
-                    width="80px" // インプットフィールドのサイズ調整
-                    bg={"gray.200"}
-                    rounded={"md"}
-                  >
-                    <NumberInputField/>
-                  </NumberInput>
-                  <Text ml={1}>%</Text>
-                </Flex>
-                <Flex alignItems="center" mt={2}>
-                  <Text mr={2}>ポイント:</Text>
-                  <NumberInput
-                    placeholder="ポイント"
-                    value={res.point}
-                    onChange={(e) => updateEmbedUIPoints(index, Number(e))}
-                    width="80px" // インプットフィールドのサイズ調整
-                    bg={"gray.200"}
-                    rounded={"md"}
-                  >
-                    <NumberInputField/>
-                  </NumberInput>
-                  <Text ml={1}>pt</Text>
-                </Flex>
-              </Flex>
-              {resultStore.results.length > 1 && (
-                <IconButton
-                  aria-label="Delete Embed UI"
-                  icon={<FaTrash/>}
-                  onClick={() => removeResultEmbedUI(index)}
-                  alignSelf="center"
-                  bg="red.400"
-                  textColor="white"
-                  size="sm"
-                />
-              )}
-            </Box>
-          ))}
-          {resultStore.results.length < 10 && (
-            <IconButton
-              aria-label="Add Embed UI"
-              icon={<FaPlus/>}
-              onClick={addResultEmbedUI}
-              alignSelf="center"
-              bg="teal"
-              textColor="white"
+      {/* EmbedUIの追加と表示 */}
+      <Flex overflowX="scroll" pb={3}>
+        {resultStore.results.map((res, index) => (
+          <Box key={index} mx={2} minWidth="300px">
+            <DiscordEmbedUI
+              title={res.title}
+              setTitle={(title) => resultStore.setTitle(index, title)}
+              description={res.description}
+              setDescription={(description) => resultStore.setDescription(index, description)}
+              file={res.image}
+              setFile={(image) => resultStore.setImage(index, image)}
+              // 確率とポイントの更新関数
             />
-          )}
-        </Flex>
-        <Text fontWeight="bold" mt={3}>確率の合計: {totalProbability}%</Text>
+            <Flex direction="column" mt={2} pb={1}>
+              <Flex alignItems="center">
+                <Text mr={2}>確率:</Text>
+                <NumberInput
+                  placeholder="確率"
+                  value={res.probability}
+                  onChange={(e) => updateEmbedUIProbability(index, Number(e))}
+                  width="80px" // インプットフィールドのサイズ調整
+                  bg={"gray.200"}
+                  rounded={"md"}
+                >
+                  <NumberInputField/>
+                </NumberInput>
+                <Text ml={1}>%</Text>
+              </Flex>
+              <Flex alignItems="center" mt={2}>
+                <Text mr={2}>ポイント:</Text>
+                <NumberInput
+                  placeholder="ポイント"
+                  value={res.point}
+                  onChange={(e) => updateEmbedUIPoints(index, Number(e))}
+                  width="80px" // インプットフィールドのサイズ調整
+                  bg={"gray.200"}
+                  rounded={"md"}
+                >
+                  <NumberInputField/>
+                </NumberInput>
+                <Text ml={1}>pt</Text>
+              </Flex>
+            </Flex>
+            {resultStore.results.length > 1 && (
+              <IconButton
+                aria-label="Delete Embed UI"
+                icon={<FaTrash/>}
+                onClick={() => removeResultEmbedUI(index)}
+                alignSelf="center"
+                bg="red.400"
+                textColor="white"
+                size="sm"
+              />
+            )}
+          </Box>
+        ))}
+        {resultStore.results.length < 10 && (
+          <IconButton
+            aria-label="Add Embed UI"
+            icon={<FaPlus/>}
+            onClick={addResultEmbedUI}
+            alignSelf="center"
+            bg="teal"
+            textColor="white"
+          />
+        )}
+      </Flex>
+      <Text fontWeight="bold" mt={3}>確率の合計: {totalProbability}%</Text>
 
-        <Flex justifyContent="flex-end" mt={3}>
-          <Button
-            colorScheme="teal"
-            onClick={handleSave}
-            isLoading={isLoading}
-            loadingText="保存中"
-            spinner={<Spinner size="sm"/>}
-            disabled={isLoading}
-          >
-            保存する
-          </Button>
-        </Flex>
+      <Flex justifyContent="flex-end" mt={3}>
+        <Button
+          colorScheme="teal"
+          onClick={handleSave}
+          isLoading={isLoading}
+          loadingText="保存中"
+          spinner={<Spinner size="sm"/>}
+          disabled={isLoading}
+        >
+          保存する
+        </Button>
+      </Flex>
 
-      </Container>
-    </>
+    </Container>
   )
 }
