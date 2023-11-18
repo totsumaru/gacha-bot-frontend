@@ -93,6 +93,7 @@ function DiscordEmbedUI(props: Props) {
                 src={typeof props.file === 'string' ? props.file : URL.createObjectURL(props.file)}
                 alt="Uploaded image"
                 borderRadius="md"
+                width="100%"
               />
             ) : (
               <Center p={12}>

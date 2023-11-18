@@ -69,7 +69,7 @@ export const useOpenStore = create<embedStore>((set, get) => ({
   title: "",
   setTitle: (title: string) => set({ title: title }),
   description: "",
-  setDescription: (description: string) => set({ description: description }),
+  setDescription: (description: string) =>  set({ description: description }) ,
   image: null,
   setImage: (image: string | File | null) => set({ image: image }),
   button: { label: "OPEN", style: "PRIMARY" },
@@ -104,6 +104,8 @@ interface resultStoreState {
   setImage: (index: number, image: string | File | null) => void;
   setProbability: (index: number, probability: number) => void;
   setPoint: (index: number, point: number) => void;
+  addResult: (newResult: resultStore) => void;
+  removeResult: (index: number) => void;
 }
 
 // Resultのstoreです
@@ -143,5 +145,15 @@ export const useResultStore = create<resultStoreState>((set, get) => ({
     const newResults = [...get().results];
     newResults[index].point = point;
     set({ results: newResults });
+  },
+  // 新しいResultを追加する関数
+  addResult: (newResult: resultStore) => {
+    const currentResults = get().results;
+    set({ results: [...currentResults, newResult] });
+  },
+  // 特定のIndexのResultを削除する関数
+  removeResult: (index: number) => {
+    const filteredResults = get().results.filter((_, i) => i !== index);
+    set({ results: filteredResults });
   }
 }));

@@ -46,21 +46,55 @@ export default function Client(props: GachaRes) {
     if (totalProbability !== 100) {
       throw new Error("確率の合計が100%ではありません");
     }
+    // パネル
     if (panelStore.title.length > 256) {
-      throw new Error("パネルのタイトルは256文字以内にしてください");
+      throw new Error("タイトルは256文字以内にしてください");
     }
     if (panelStore.description.length === 0) {
+      throw new Error("メッセージが空の場所があります");
+    }
+    if (panelStore.description.length > 1500) {
+      throw new Error("メッセージは1500文字以内にしてください");
+    }
+    // オープン
+    if (openStore.title.length > 256) {
+      throw new Error("タイトルは256文字以内にしてください");
+    }
+    if (openStore.description.length === 0) {
       throw new Error("メッセージが空の場所があります");
     }
     if (openStore.description.length > 1500) {
       throw new Error("メッセージは1500文字以内にしてください");
     }
+    // リザルト
+    resultStore.results.forEach((res) => {
+      if (res.title.length > 256) {
+        throw new Error(`タイトルは256文字以内にしてください`);
+      }
+      if (res.description.length === 0) {
+        throw new Error(`メッセージが空の場所があります`);
+      }
+      if (res.description.length > 1500) {
+        throw new Error(`メッセージは1500文字以内にしてください`);
+      }
+    });
 
     return true;
   }
 
   // 保存ボタンをクリックした時の処理です
   const handleSave = async () => {
+    try {
+      validate()
+    } catch (error: any) {
+      toast({
+        title: error.message || "エラーが発生しました",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return
+    }
     setIsLoading(true);
 
     try {
@@ -151,14 +185,13 @@ export default function Client(props: GachaRes) {
   // ResultのEmbedを追加します
   const addResultEmbedUI = () => {
     if (resultStore.results.length < 10) { // MAXは10
-      const newResult: resultStore = {
+      resultStore.addResult({
         title: "",
         description: "",
         image: null,
         probability: 0,
         point: 0,
-      };
-      resultStore.results.push(newResult);
+      });
     }
   };
 
@@ -166,7 +199,7 @@ export default function Client(props: GachaRes) {
   // 特定のResult Embedを削除します
   const removeResultEmbedUI = (index: number) => {
     if (resultStore.results.length > 1) { // 最低数は1
-      resultStore.results.splice(index, 1);
+      resultStore.removeResult(index);
     }
   };
 
