@@ -16,8 +16,8 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { ChevronDownIcon, ChevronRightIcon, CloseIcon, HamburgerIcon, } from '@chakra-ui/icons'
-import LoginButton from "@/components/LoginButton";
-import LogoutButton from "@/components/LogoutButton";
+import LoginButton from "@/components/button/LoginButton";
+import LogoutButton from "@/components/button/LogoutButton";
 
 type Props = {
   isLogin?: boolean
