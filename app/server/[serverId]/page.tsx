@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import Client from "@/app/server/[serverId]/Client";
 import { getGacha } from "@/utils/api/get_gacha";
 import Header from "@/components/Header";
-import { Center } from "@chakra-ui/react";
+import { Button, Center, Stack } from "@chakra-ui/react";
+import { getServer } from "@/utils/api/get_server";
+import React from "react";
 
 export default async function Index({
   params: { serverId }
@@ -30,19 +32,38 @@ export default async function Index({
     accessToken: session.access_token,
   })
 
+  const server = await getServer({
+    serverId: serverId,
+    accessToken: session.access_token,
+  })
+
   return (
     <>
       <Header isLogin={true} displayLoginButton={true} serverId={serverId}/>
-      <Client
-        accessToken={session.access_token}
-        gachaRes={{
-          id: gacha.id,
-          server_id: gacha.server_id,
-          panel: gacha.panel,
-          open: gacha.open,
-          result: gacha.result,
-        }}
-      />
+      {server.subscriber_id ? (
+        <Client
+          accessToken={session.access_token}
+          gachaRes={{
+            id: gacha.id,
+            server_id: gacha.server_id,
+            panel: gacha.panel,
+            open: gacha.open,
+            result: gacha.result,
+          }}
+        />
+      ) : (
+        <Stack spacing={4} align="center" mt={20}>
+          <p>このサーバーはまだ登録されていません。</p>
+          <Button
+            as={"a"}
+            href={`/server/${serverId}/dashboard`}
+            colorScheme="teal"
+            ml={2}
+          >
+            ダッシュボードへ移動
+          </Button>
+        </Stack>
+      )}
     </>
   )
 }

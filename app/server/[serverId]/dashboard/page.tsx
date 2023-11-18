@@ -38,16 +38,22 @@ export default async function Index({
     // サブスクライバー(支払い者)には、カスタマーポータルを表示します
     if (serverRes.is_subscriber) {
       buttonOrText = (
-        <CustomerPortalButton
-          serverId={serverId}
-          accessToken={session?.access_token || ""}
-        />
+        <>
+          <CustomerPortalButton
+            serverId={serverId}
+            accessToken={session?.access_token || ""}
+          />
+          <Text mt={5}>
+            ✅ 機能が使用できます。<br/>
+            ※お支払い情報は本人しか閲覧できません。
+          </Text>
+        </>
       )
     } else {
       buttonOrText = (
         <Text mt={5}>
-          ✅機能が使用できます。<br/>
-          ※支払い情報は本人しか閲覧できません。
+          ✅ 機能が使用できます。<br/>
+          ※お支払い情報は本人しか閲覧できません。
         </Text>
       )
     }

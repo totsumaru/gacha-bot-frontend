@@ -6,6 +6,7 @@ import {
   Flex,
   Icon,
   IconButton,
+  Link as ChakraLink,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -60,7 +61,7 @@ export default function Header({ isLogin, displayLoginButton, serverId }: Props)
           </Text>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav/>
+            <DesktopNav serverId={serverId || ""}/>
           </Flex>
         </Flex>
 
@@ -78,36 +79,37 @@ export default function Header({ isLogin, displayLoginButton, serverId }: Props)
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
-        <MobileNav/>
+        <MobileNav serverId={serverId || ""}/>
       </Collapse>
     </Box>
   )
 }
 
-const DesktopNav = () => {
+const DesktopNav = ({ serverId }: { serverId: string }) => {
   const linkColor = useColorModeValue('gray.600', 'gray.200')
   const linkHoverColor = useColorModeValue('gray.800', 'white')
   const popoverContentBgColor = useColorModeValue('white', 'gray.800')
 
   return (
     <Stack direction={'row'} spacing={4}>
-      {NAV_ITEMS.map((navItem) => (
+      {NAV_ITEMS(serverId).map((navItem) => (
         <Box key={navItem.label}>
           <Popover trigger={'hover'} placement={'bottom-start'}>
             <PopoverTrigger>
-              <Box
-                as="a"
-                p={2}
+              <ChakraLink
                 href={navItem.href ?? '#'}
+                p={2}
                 fontSize={'sm'}
                 fontWeight={500}
                 color={linkColor}
                 _hover={{
                   textDecoration: 'none',
                   color: linkHoverColor,
-                }}>
+                }}
+              >
                 {navItem.label}
-              </Box>
+              </ChakraLink>
+
             </PopoverTrigger>
 
             {navItem.children && (
@@ -167,10 +169,10 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
   )
 }
 
-const MobileNav = () => {
+const MobileNav = ({ serverId }: { serverId: string }) => {
   return (
     <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
-      {NAV_ITEMS.map((navItem) => (
+      {NAV_ITEMS(serverId).map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>
@@ -232,9 +234,19 @@ interface NavItem {
   href?: string
 }
 
-const NAV_ITEMS: Array<NavItem> = [
-  {
-    label: 'Topページ',
-    href: '/',
-  },
-]
+const NAV_ITEMS = (serverId: string): Array<NavItem> => {
+  return [
+    {
+      label: 'Topページ',
+      href: '/',
+    },
+    {
+      label: 'ガチャ',
+      href: `/server/${serverId}`,
+    },
+    {
+      label: 'ダッシュボード',
+      href: `/server/${serverId}/dashboard`,
+    },
+  ]
+}
