@@ -1,17 +1,17 @@
 "use client"
 
 // 支払いのチェックアウトを作成します
-import { checkout } from "@/utils/api/checkout";
 import { useEffect, useState } from "react";
 import { Button } from "@chakra-ui/react";
+import { customerPortal } from "@/utils/api/customer_portal";
 
 type Props = {
   serverId: string
   accessToken: string
 }
 
-// チェックアウトを作成するボタンです
-export default function CheckoutButton({ serverId, accessToken }: Props) {
+// カスタマーポータルを作成するボタンです
+export default function CustomerPortalButton({ serverId, accessToken }: Props) {
   const [loading, setLoading] = useState(false)
   const [url, setUrl] = useState("")
 
@@ -19,7 +19,7 @@ export default function CheckoutButton({ serverId, accessToken }: Props) {
     (async () => {
       setLoading(true)
 
-      const redirectUrl = await checkout({
+      const redirectUrl = await customerPortal({
         serverId: serverId,
         accessToken: accessToken,
       })
@@ -37,7 +37,7 @@ export default function CheckoutButton({ serverId, accessToken }: Props) {
       isLoading={loading}
       isDisabled={loading || !url}
     >
-      お支払い
+      お支払い情報の確認
     </Button>
   )
 }

@@ -3,11 +3,11 @@ type Props = {
   accessToken: string
 }
 
-// チェックアウトを作成します
-export async function checkout(
+// カスタマーポータルを作成します
+export async function customerPortal(
   { serverId, accessToken }: Props
 ): Promise<string> {
-  const endpoint = process.env.NEXT_PUBLIC_BE_URL + "/api/checkout?server_id=" + serverId;
+  const endpoint = process.env.NEXT_PUBLIC_BE_URL + "/api/portal?server_id=" + serverId;
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
