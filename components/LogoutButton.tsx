@@ -3,24 +3,21 @@
 import { Button, Spinner } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function LoginButton() {
+export default function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClientComponentClient();
+  const router = useRouter()
 
-  const signIn = async () => {
+  const signOut = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'discord',
-        options: {
-          scopes: "guilds",
-          redirectTo: `${process.env.NEXT_PUBLIC_FE_URL}/callback`
-        }
-      });
+      const { error } = await supabase.auth.signOut();
       if (error) {
         alert(`エラーが発生しました: ${error.message}`);
       }
+      router.push("/")
     } catch (e) {
       alert(`エラーが発生しました`);
     }
@@ -29,11 +26,12 @@ export default function LoginButton() {
   return (
     <Button
       colorScheme="teal"
-      onClick={signIn}
+      onClick={signOut}
       isLoading={isLoading}
+      variant={"outline"}
       spinner={<Spinner size="sm"/>}
     >
-      ログイン
+      ログアウト
     </Button>
   );
 }

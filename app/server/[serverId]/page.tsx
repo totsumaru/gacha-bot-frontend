@@ -16,7 +16,7 @@ export default async function Index({
   if (!session) {
     return (
       <>
-        <Header/>
+        <Header isLogin={false}/>
         <Center mt={20}>
           ログインしてください。
         </Center>
@@ -28,7 +28,7 @@ export default async function Index({
 
   return (
     <>
-      <Header/>
+      <Header isLogin={true}/>
       <Client
         id={gacha.id}
         server_id={gacha.server_id}

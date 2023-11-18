@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   Box,
@@ -17,8 +17,13 @@ import {
 } from '@chakra-ui/react'
 import { ChevronDownIcon, ChevronRightIcon, CloseIcon, HamburgerIcon, } from '@chakra-ui/icons'
 import LoginButton from "@/components/LoginButton";
+import LogoutButton from "@/components/LogoutButton";
 
-export default function Header() {
+type Props = {
+  isLogin: boolean
+}
+
+export default function Header({ isLogin }: Props) {
   const { isOpen, onToggle } = useDisclosure()
 
   return (
@@ -64,7 +69,7 @@ export default function Header() {
           spacing={6}
         >
           {/* ログインボタン */}
-          <LoginButton/>
+          {isLogin ? <LogoutButton/> : <LoginButton/>}
         </Stack>
       </Flex>
 
