@@ -8,7 +8,6 @@ import {
   IconButton,
   Link as ChakraLink,
   Popover,
-  PopoverContent,
   PopoverTrigger,
   Stack,
   Text,
@@ -16,7 +15,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
-import { ChevronDownIcon, ChevronRightIcon, CloseIcon, HamburgerIcon, } from '@chakra-ui/icons'
+import { ChevronDownIcon, CloseIcon, HamburgerIcon, } from '@chakra-ui/icons'
 import LoginButton from "@/components/button/LoginButton";
 import LogoutButton from "@/components/button/LogoutButton";
 
@@ -24,9 +23,12 @@ type Props = {
   isLogin?: boolean
   displayLoginButton?: boolean
   serverId?: string
+  isTopPage?: boolean
 }
 
-export default function Header({ isLogin, displayLoginButton, serverId }: Props) {
+export default function Header({
+  isLogin, displayLoginButton, serverId, isTopPage
+}: Props) {
   const { isOpen, onToggle } = useDisclosure()
 
   return (
@@ -54,14 +56,15 @@ export default function Header({ isLogin, displayLoginButton, serverId }: Props)
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
           <Text
+            fontWeight={"bold"}
             textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
             fontFamily={'heading'}
             color={useColorModeValue('gray.800', 'white')}>
-            Logo
+            Gacha-bot
           </Text>
 
           <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-            <DesktopNav serverId={serverId || ""}/>
+            <DesktopNav serverId={serverId || ""} isTopPage={isTopPage || false}/>
           </Flex>
         </Flex>
 
@@ -85,87 +88,42 @@ export default function Header({ isLogin, displayLoginButton, serverId }: Props)
   )
 }
 
-const DesktopNav = ({ serverId }: { serverId: string }) => {
+const DesktopNav = ({
+  serverId, isTopPage
+}: {
+  serverId: string,
+  isTopPage: boolean
+}) => {
   const linkColor = useColorModeValue('gray.600', 'gray.200')
   const linkHoverColor = useColorModeValue('gray.800', 'white')
-  const popoverContentBgColor = useColorModeValue('white', 'gray.800')
 
   return (
     <Stack direction={'row'} spacing={4}>
       {NAV_ITEMS(serverId).map((navItem) => (
-        <Box key={navItem.label}>
-          <Popover trigger={'hover'} placement={'bottom-start'}>
-            <PopoverTrigger>
-              <ChakraLink
-                href={navItem.href ?? '#'}
-                p={2}
-                fontSize={'sm'}
-                fontWeight={500}
-                color={linkColor}
-                _hover={{
-                  textDecoration: 'none',
-                  color: linkHoverColor,
-                }}
-              >
-                {navItem.label}
-              </ChakraLink>
-
-            </PopoverTrigger>
-
-            {navItem.children && (
-              <PopoverContent
-                border={0}
-                boxShadow={'xl'}
-                bg={popoverContentBgColor}
-                p={4}
-                rounded={'xl'}
-                minW={'sm'}>
-                <Stack>
-                  {navItem.children.map((child) => (
-                    <DesktopSubNav key={child.label} {...child} />
-                  ))}
-                </Stack>
-              </PopoverContent>
-            )}
-          </Popover>
-        </Box>
-      ))}
+          navItem.isTopPageDisplay && isTopPage === true && (
+            <Box key={navItem.label}>
+              <Popover trigger={'hover'} placement={'bottom-start'}>
+                <PopoverTrigger>
+                  <ChakraLink
+                    href={navItem.href ?? '#'}
+                    p={2}
+                    fontSize={'sm'}
+                    fontWeight={500}
+                    color={linkColor}
+                    _hover={{
+                      textDecoration: 'none',
+                      color: linkHoverColor,
+                    }}
+                  >
+                    {navItem.label}
+                  </ChakraLink>
+                </PopoverTrigger>
+              </Popover>
+            </Box>
+          )
+        )
+      )}
     </Stack>
-  )
-}
-
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
-  return (
-    <Box
-      as="a"
-      href={href}
-      role={'group'}
-      display={'block'}
-      p={2}
-      rounded={'md'}
-      _hover={{ bg: useColorModeValue('pink.50', 'gray.900') }}>
-      <Stack direction={'row'} align={'center'}>
-        <Box>
-          <Text
-            transition={'all .3s ease'}
-            _groupHover={{ color: 'pink.400' }}
-            fontWeight={500}>
-            {label}
-          </Text>
-          <Text fontSize={'sm'}>{subLabel}</Text>
-        </Box>
-        <Flex
-          transition={'all .3s ease'}
-          transform={'translateX(-10px)'}
-          opacity={0}
-          _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-          justify={'flex-end'}
-          align={'center'}
-          flex={1}>
-          <Icon color={'pink.400'} w={5} h={5} as={ChevronRightIcon}/>
-        </Flex>
-      </Stack>
-    </Box>
   )
 }
 
@@ -232,6 +190,7 @@ interface NavItem {
   subLabel?: string
   children?: Array<NavItem>
   href?: string
+  isTopPageDisplay: boolean
 }
 
 const NAV_ITEMS = (serverId: string): Array<NavItem> => {
@@ -239,14 +198,17 @@ const NAV_ITEMS = (serverId: string): Array<NavItem> => {
     {
       label: 'Topページ',
       href: '/',
+      isTopPageDisplay: true,
     },
     {
       label: 'ガチャ',
       href: `/server/${serverId}`,
+      isTopPageDisplay: false,
     },
     {
       label: 'ダッシュボード',
       href: `/server/${serverId}/dashboard`,
+      isTopPageDisplay: false,
     },
   ]
 }
