@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { EmbedReq } from "@/utils/api/body";
+import { EmbedReq, ResultReq } from "@/utils/api/body";
 
+// EmbedのStoreの型です
 interface embedStore {
   init: (embedReq: EmbedReq) => void;
   title: string;
@@ -17,6 +18,7 @@ interface embedStore {
   setButtonStyle: (style: "PRIMARY" | "SUCCESS") => void;
 }
 
+// パネルのストアです
 export const usePanelStore = create<embedStore>((set, get) => ({
   init: (embedReq: EmbedReq) => {
     console.log(embedReq)
@@ -51,6 +53,7 @@ export const usePanelStore = create<embedStore>((set, get) => ({
   }),
 }));
 
+// Openのストアです
 export const useOpenStore = create<embedStore>((set, get) => ({
   init: (embedReq: EmbedReq) => {
     set({
@@ -82,4 +85,63 @@ export const useOpenStore = create<embedStore>((set, get) => ({
       style: style || "PRIMARY",
     }
   }),
+}));
+
+// Resultのストアの型です
+export interface resultStore {
+  title: string;
+  description: string;
+  image: string | File | null;
+  probability: number;
+  point: number;
+}
+
+interface resultStoreState {
+  results: resultStore[];
+  init: (resultReqs: ResultReq[]) => void;
+  setTitle: (index: number, title: string) => void;
+  setDescription: (index: number, description: string) => void;
+  setImage: (index: number, image: string | File | null) => void;
+  setProbability: (index: number, probability: number) => void;
+  setPoint: (index: number, point: number) => void;
+}
+
+// Resultのstoreです
+export const useResultStore = create<resultStoreState>((set, get) => ({
+  results: [],
+  init: (resultReqs: ResultReq[]) => {
+    const newResults = resultReqs.map(req => ({
+      title: req.embed.title,
+      description: req.embed.description,
+      image: req.embed.image_url,
+      probability: req.probability,
+      point: req.point,
+    }));
+    set({ results: newResults });
+  },
+  setTitle: (index: number, title: string) => {
+    const newResults = [...get().results];
+    newResults[index].title = title;
+    set({ results: newResults });
+  },
+  setDescription: (index: number, description: string) => {
+    const newResults = [...get().results];
+    newResults[index].description = description;
+    set({ results: newResults });
+  },
+  setImage: (index: number, image: string | File | null) => {
+    const newResults = [...get().results];
+    newResults[index].image = image;
+    set({ results: newResults });
+  },
+  setProbability: (index: number, probability: number) => {
+    const newResults = [...get().results];
+    newResults[index].probability = probability;
+    set({ results: newResults });
+  },
+  setPoint: (index: number, point: number) => {
+    const newResults = [...get().results];
+    newResults[index].point = point;
+    set({ results: newResults });
+  }
 }));

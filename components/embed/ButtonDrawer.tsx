@@ -46,6 +46,11 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
   };
 
   const handleSave = () => {
+    // ボタンのラベルが8文字を超えていたらエラーを出す
+    if (newLabel.length > 8) {
+      alert('ボタンのラベルは8文字以内にしてください');
+      return;
+    }
     setLabel(newLabel);
     setStyle(newStyle);
     onClose();
