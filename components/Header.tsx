@@ -20,10 +20,12 @@ import LoginButton from "@/components/LoginButton";
 import LogoutButton from "@/components/LogoutButton";
 
 type Props = {
-  isLogin: boolean
+  isLogin?: boolean
+  displayLoginButton?: boolean
+  serverId?: string
 }
 
-export default function Header({ isLogin }: Props) {
+export default function Header({ isLogin, displayLoginButton, serverId }: Props) {
   const { isOpen, onToggle } = useDisclosure()
 
   return (
@@ -69,7 +71,9 @@ export default function Header({ isLogin }: Props) {
           spacing={6}
         >
           {/* ログインボタン */}
-          {isLogin ? <LogoutButton/> : <LoginButton/>}
+          {displayLoginButton === true && (isLogin ?
+              <LogoutButton/> : <LoginButton serverId={serverId || ""}/>
+          )}
         </Stack>
       </Flex>
 

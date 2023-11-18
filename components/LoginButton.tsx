@@ -4,7 +4,11 @@ import { Button, Spinner } from "@chakra-ui/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
 
-export default function LoginButton() {
+type Props = {
+  serverId: string
+}
+
+export default function LoginButton({ serverId }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const supabase = createClientComponentClient();
 
@@ -15,7 +19,7 @@ export default function LoginButton() {
         provider: 'discord',
         options: {
           scopes: "guilds",
-          redirectTo: `${process.env.NEXT_PUBLIC_FE_URL}/callback`
+          redirectTo: `${process.env.NEXT_PUBLIC_FE_URL}/auth/callback?server_id=${serverId}`
         }
       });
       if (error) {
