@@ -20,18 +20,23 @@ import { uploadImages } from "@/utils/api/upload_images";
 import { upsertGacha } from "@/utils/api/upsert_gacha";
 import { useOpenStore, usePanelStore, useResultStore } from "@/utils/store/gachaStore";
 
+type Props = {
+  accessToken: string
+  gachaRes: GachaRes
+}
+
 /**
  * クライアントの処理を行います
  */
-export default function Client(props: GachaRes) {
+export default function Client({ gachaRes, accessToken }: Props) {
   const panelStore = usePanelStore();
   const openStore = useOpenStore();
   const resultStore = useResultStore();
 
   useEffect(() => {
-    panelStore.init(props.panel);
-    openStore.init(props.open);
-    resultStore.init(props.result);
+    panelStore.init(gachaRes.panel);
+    openStore.init(gachaRes.open);
+    resultStore.init(gachaRes.result);
   }, []);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -106,7 +111,12 @@ export default function Client(props: GachaRes) {
 
       let uploadedImageUrls: string[] = [];
       if (imageFilesToUpload.length !== 0) {
-        uploadedImageUrls = await uploadImages(imageFilesToUpload);
+        uploadedImageUrls = await uploadImages({
+            serverId: gachaRes.server_id,
+            accessToken: accessToken,
+            imageFiles: imageFilesToUpload
+          }
+        )
       }
 
       // アップロードされた画像のURLか、元のURLを使用
@@ -115,8 +125,8 @@ export default function Client(props: GachaRes) {
 
       // APIリクエストに必要なデータを準備
       const requestData: GachaReq = {
-        id: props.id,
-        server_id: props.server_id,
+        id: gachaRes.id,
+        server_id: gachaRes.server_id,
         panel: {
           title: panelStore.title,
           description: panelStore.description,
@@ -159,7 +169,10 @@ export default function Client(props: GachaRes) {
       };
 
       // APIリクエストを送信
-      await upsertGacha(requestData)
+      await upsertGacha(requestData, {
+        serverId: gachaRes.server_id,
+        accessToken: accessToken,
+      })
 
       toast({
         title: "ガチャの設定が保存されました",

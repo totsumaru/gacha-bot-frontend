@@ -21,7 +21,6 @@ interface embedStore {
 // パネルのストアです
 export const usePanelStore = create<embedStore>((set, get) => ({
   init: (embedReq: EmbedReq) => {
-    console.log(embedReq)
     set({
       title: embedReq.title,
       description: embedReq.description,
@@ -69,7 +68,7 @@ export const useOpenStore = create<embedStore>((set, get) => ({
   title: "",
   setTitle: (title: string) => set({ title: title }),
   description: "",
-  setDescription: (description: string) =>  set({ description: description }) ,
+  setDescription: (description: string) => set({ description: description }),
   image: null,
   setImage: (image: string | File | null) => set({ image: image }),
   button: { label: "OPEN", style: "PRIMARY" },

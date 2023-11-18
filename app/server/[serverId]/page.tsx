@@ -13,6 +13,7 @@ export default async function Index({
   const supabase = createServerComponentClient({ cookies })
   const { data: { session } } = await supabase.auth.getSession()
 
+  // ログインしていない場合は、ログインメッセージを表示
   if (!session) {
     return (
       <>
@@ -24,17 +25,23 @@ export default async function Index({
     )
   }
 
-  const gacha = await getGacha(serverId)
+  const gacha = await getGacha({
+    serverId: serverId,
+    accessToken: session.access_token,
+  })
 
   return (
     <>
       <Header isLogin={true} displayLoginButton={true} serverId={serverId}/>
       <Client
-        id={gacha.id}
-        server_id={gacha.server_id}
-        panel={gacha.panel}
-        open={gacha.open}
-        result={gacha.result}
+        accessToken={session.access_token}
+        gachaRes={{
+          id: gacha.id,
+          server_id: gacha.server_id,
+          panel: gacha.panel,
+          open: gacha.open,
+          result: gacha.result,
+        }}
       />
     </>
   )
