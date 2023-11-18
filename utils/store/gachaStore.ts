@@ -19,6 +19,7 @@ interface embedStore {
 
 export const usePanelStore = create<embedStore>((set, get) => ({
   init: (embedReq: EmbedReq) => {
+    console.log(embedReq)
     set({
       title: embedReq.title,
       description: embedReq.description,
@@ -53,7 +54,7 @@ export const usePanelStore = create<embedStore>((set, get) => ({
 export const useOpenStore = create<embedStore>((set, get) => ({
   init: (embedReq: EmbedReq) => {
     set({
-      title: embedReq.title,
+      title: embedReq?.title || "",
       description: embedReq.description,
       image: embedReq.image_url,
       button: {

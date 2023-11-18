@@ -45,6 +45,7 @@ function DiscordEmbedUI(props: Props) {
 
         {/* タイトル */}
         <Input
+          value={props.title}
           placeholder="タイトル"
           variant="filled"
           onChange={(e) => props.setTitle(e.target.value)}
@@ -55,6 +56,7 @@ function DiscordEmbedUI(props: Props) {
 
         {/* Message Textarea */}
         <Textarea
+          value={props.description}
           placeholder="メッセージをここに記入"
           variant="filled"
           size="md"
@@ -113,7 +115,6 @@ function DiscordEmbedUI(props: Props) {
           )}
         </Box>
 
-        {/* 'ガチャを引く' Button */}
         {props.buttonLabel && props.buttonStyle && (
           <HStack justifyContent="flex-start">
             <ButtonDrawer

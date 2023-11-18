@@ -17,7 +17,7 @@ export default async function Index({
     <>
       <Client
         id={gacha.id}
-        server_id={serverId}
+        server_id={gacha.server_id}
         panel={gacha.panel}
         open={gacha.open}
         result={gacha.result}

@@ -16,10 +16,10 @@ import Header from "@/components/Header";
 import React, { useEffect, useState } from "react";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { ButtonStyle, GachaReq, GachaRes } from "@/utils/api/body";
+import { GachaReq, GachaRes } from "@/utils/api/body";
 import { uploadImages } from "@/utils/api/upload_images";
 import { upsertGacha } from "@/utils/api/upsert_gacha";
-import { usePanelStore } from "@/utils/store/gachaStore";
+import { useOpenStore, usePanelStore } from "@/utils/store/gachaStore";
 
 type ResultEmbedUIState = {
   title: string;
@@ -29,23 +29,18 @@ type ResultEmbedUIState = {
   points: number;
 };
 
+/**
+ * クライアントの処理を行います
+ */
 export default function Client(props: GachaRes) {
   const panelStore = usePanelStore();
+  const openStore = useOpenStore();
 
   useEffect(() => {
     panelStore.init(props.panel);
+    openStore.init(props.open);
   }, []);
 
-  // Open
-  const [openTitle, setOpenTitle] = useState<string>(props.open.title || "")
-  const [openDescription, setOpenDescription] = useState<string>(props.open.description || "")
-  const [openImage, setOpenImage] = useState<File | null>(null)
-  const [openButtonLabel, setOpenButtonLabel] = useState<string>(
-    props.open.button[0].label || "OPEN"
-  )
-  const [openButtonStyle, setOpenButtonStyle] = useState<ButtonStyle>(
-    props.panel.button[0].style
-  )
   const [embedUIs, setEmbedUIs] = useState<ResultEmbedUIState[]>([{
     title: "",
     description: "",
@@ -58,84 +53,93 @@ export default function Client(props: GachaRes) {
 
   // 保存ボタンをクリックした時の処理です
   const handleSave = async () => {
-    setIsLoading(true);
+      setIsLoading(true);
 
-    try {
-      // 画像をアップロード
-      const allImageFiles = [
-        panelStore.image,
-        openImage,
-        ...embedUIs.map(ui => ui.image),
-      ].filter(file => file != null);
+      try {
+        // 画像をアップロード
+        const imageFilesToUpload = [
+          panelStore.image instanceof File ? panelStore.image : null,
+          openStore.image instanceof File ? panelStore.image : null,
+          ...embedUIs.map(ui => ui.image instanceof File ? ui.image : null),
+        ].filter(file => file !== null) as File[]; // File型のみの配列を保証
 
-      let uploadedImageUrls: string[] = [];
-      if (allImageFiles.length !== 0) {
-        uploadedImageUrls = await uploadImages(allImageFiles as File[]);
-      }
+        let uploadedImageUrls: string[] = [];
+        if (imageFilesToUpload.length !== 0) {
+          uploadedImageUrls = await uploadImages(imageFilesToUpload);
+        }
 
-      // APIリクエストに必要なデータを準備
-      const requestData: GachaReq = {
-        id: props.id,
-        server_id: props.server_id,
-        panel: {
-          title: panelStore.title,
-          description: panelStore.description,
-          color: 0,
-          image_url: uploadedImageUrls[0],
-          thumbnail_url: "",
-          button: [{
-            kind: "to_open",
-            label: panelStore.button.label,
-            style: panelStore.button.style,
-          }],
-        },
-        open: {
-          title: openTitle,
-          description: openDescription,
-          color: 0,
-          image_url: uploadedImageUrls[1],
-          thumbnail_url: "",
-          button: [{
-            kind: "to_result",
-            label: openButtonLabel,
-            style: "SUCCESS",
-          }],
-        },
-        result: embedUIs.map((ui, index) => ({
-          embed: {
-            title: ui.title,
-            description: ui.description,
+        // アップロードされた画像のURLか、元のURLを使用
+        const panelImageUrl = panelStore.image instanceof File ? uploadedImageUrls.shift() : panelStore.image;
+        const openImageUrl = openStore.image instanceof File ? uploadedImageUrls.shift() : openStore.image;
+
+        // APIリクエストに必要なデータを準備
+        const requestData: GachaReq = {
+          id: props.id,
+          server_id: props.server_id,
+          panel: {
+            title: panelStore.title,
+            description: panelStore.description,
             color: 0,
-            image_url: uploadedImageUrls[index + 2],
+            image_url: panelImageUrl || "", // アップロードされたURLか元のURL
             thumbnail_url: "",
-            button: [],
+            button: [{
+              kind: "to_open",
+              label: panelStore.button.label,
+              style: panelStore.button.style,
+            }],
           },
-          point: ui.points,
-          probability: ui.probability,
-        }))
-      };
+          open: {
+            title: openStore.title,
+            description: openStore.description,
+            color: 0,
+            image_url: openImageUrl || "", // アップロードされたURLか元のURL
+            thumbnail_url: "",
+            button: [{
+              kind: "to_result",
+              label: openStore.button.label,
+              style: openStore.button.style,
+            }],
+          },
+          result: embedUIs.map((ui, index) => {
+            const imageUrl = ui.image instanceof File ? uploadedImageUrls[index] : ui.image;
+            return {
+              embed: {
+                title: ui.title,
+                description: ui.description,
+                color: 0,
+                image_url: imageUrl || "", // アップロードされたURLか元のURL
+                thumbnail_url: "",
+                button: [],
+              },
+              point: ui.points,
+              probability: ui.probability,
+            }
+          })
+        };
 
-      // APIリクエストを送信
-      await upsertGacha(requestData)
+        // APIリクエストを送信
+        await upsertGacha(requestData)
 
-      toast({
-        title: "ガチャの設定が保存されました",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch (error) {
-      console.error("エラーが発生しました", error);
-      toast({
-        title: "画像のアップロードまたは保存に失敗しました",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
+        toast({
+          title: "ガチャの設定が保存されました",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } catch
+        (error) {
+        console.error("エラーが発生しました", error);
+        toast({
+          title: "画像のアップロードまたは保存に失敗しました",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
-  };
+  ;
 
   // ResultのEmbedを追加します
   const addResultEmbedUI = () => {
@@ -221,16 +225,16 @@ export default function Client(props: GachaRes) {
           Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
         </Text>
         <DiscordEmbedUI
-          title={openTitle}
-          setTitle={(title) => setOpenTitle(title)}
-          description={openDescription}
-          setDescription={(description) => setOpenDescription(description)}
-          file={openImage}
-          setFile={(image) => setOpenImage(image)}
-          buttonLabel={openButtonLabel}
-          setButtonLabel={(buttonLabel) => setOpenButtonLabel(buttonLabel)}
-          buttonStyle={openButtonStyle}
-          setButtonStyle={(buttonColor) => setOpenButtonStyle(buttonColor)}
+          title={openStore.title}
+          setTitle={(title) => openStore.setTitle(title)}
+          description={openStore.description}
+          setDescription={(description) => openStore.setDescription(description)}
+          file={openStore.image}
+          setFile={(image) => openStore.setImage(image)}
+          buttonLabel={openStore.button.label}
+          setButtonLabel={(buttonLabel) => openStore.setButtonLabel(buttonLabel)}
+          buttonStyle={openStore.button.style}
+          setButtonStyle={(buttonColor) => openStore.setButtonStyle(buttonColor)}
         />
 
         {/* Result */}
