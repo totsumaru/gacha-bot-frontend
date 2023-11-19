@@ -102,7 +102,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
     setIsLoading(true);
 
     try {
-      // 画像をアップロード
+      // File型のみ画像をアップロード
       const imageFilesToUpload = [
         panelStore.image instanceof File ? panelStore.image : null,
         openStore.image instanceof File ? openStore.image : null,
@@ -151,8 +151,8 @@ export default function Client({ gachaRes, accessToken }: Props) {
             style: openStore.button.style,
           }],
         },
-        result: resultStore.results.map((res, index) => {
-          const imageUrl = res.image instanceof File ? uploadedImageUrls[index] : res.image;
+        result: resultStore.results.map((res) => {
+          const imageUrl = res.image instanceof File ? uploadedImageUrls.shift() : res.image;
           return {
             embed: {
               title: res.title,
