@@ -99,8 +99,13 @@ const DesktopNav = ({
 
   return (
     <Stack direction={'row'} spacing={4}>
-      {NAV_ITEMS(serverId).map((navItem) => (
-          navItem.isTopPageDisplay && isTopPage === true && (
+      {NAV_ITEMS(serverId).map((navItem) => {
+          if (isTopPage) {
+            if (!navItem.isTopPageDisplay) {
+              return null
+            }
+          }
+          return (
             <Box key={navItem.label}>
               <Popover trigger={'hover'} placement={'bottom-start'}>
                 <PopoverTrigger>
@@ -121,7 +126,7 @@ const DesktopNav = ({
               </Popover>
             </Box>
           )
-        )
+        }
       )}
     </Stack>
   )
