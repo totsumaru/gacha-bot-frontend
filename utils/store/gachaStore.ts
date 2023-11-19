@@ -37,10 +37,10 @@ export const usePanelStore = create<embedStore>((set, get) => ({
   setDescription: (description: string) => set({ description: description }),
   image: null,
   setImage: (image: string | File | null) => set({ image: image }),
-  button: { label: "ガチャを引く", style: "PRIMARY" },
+  button: { label: "ガチャを回す", style: "PRIMARY" },
   setButtonLabel: (label: string) => set({
     button: {
-      label: label || "ガチャを引く",
+      label: label || "ガチャを回す",
       style: get().button.style,
     }
   }),
@@ -71,10 +71,10 @@ export const useOpenStore = create<embedStore>((set, get) => ({
   setDescription: (description: string) => set({ description: description }),
   image: null,
   setImage: (image: string | File | null) => set({ image: image }),
-  button: { label: "OPEN", style: "PRIMARY" },
+  button: { label: "結果を見る", style: "PRIMARY" },
   setButtonLabel: (label: string) => set({
     button: {
-      label: label || "OPEN",
+      label: label || "結果を見る",
       style: get().button.style,
     }
   }),
