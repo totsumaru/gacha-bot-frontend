@@ -226,7 +226,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
   return (
     <Container mt={10} pb={20}>
       {/* パネル */}
-      <Text fontSize='xl' fontWeight="bold">1. Panel</Text>
+      <Text fontSize='xl' fontWeight="bold">1. ガチャのパネル</Text>
       <Text fontSize='base' mb={3}>
         常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
       </Text>
@@ -245,7 +245,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
       />
 
       {/* Open */}
-      <Text fontSize='xl' mt={5} fontWeight="bold">2. Open</Text>
+      <Text fontSize='xl' mt={5} fontWeight="bold">2. ガチャをOPEN</Text>
       <Text fontSize='base' mb={3}>
         Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
       </Text>
@@ -263,9 +263,9 @@ export default function Client({ gachaRes, accessToken }: Props) {
       />
 
       {/* Result */}
-      <Text fontSize='xl' mt={5} fontWeight="bold">3. Result</Text>
+      <Text fontSize='xl' mt={5} fontWeight="bold">3. 結果を表示</Text>
       <Text fontSize='base' mb={3}>
-        当たり/ハズレなどの結果発表です。登録されたものの中からランダムで表示されます。
+        登録された結果の中から、確率に応じてランダムで表示されます。
         それぞれの表示確率を設定できますが、<b>全ての合計が「100(%)」</b>になるようにしてください。
         ポイントは、その結果になった時に得られるポイントです。
       </Text>

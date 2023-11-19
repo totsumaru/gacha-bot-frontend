@@ -18,7 +18,7 @@ const options = [
   { id: 1, desc: '全ての機能を利用できます' },
   { id: 2, desc: 'ガチャに応じたポイントを取得/表示ができます' },
   { id: 3, desc: '画像,文字は自由に変更可能' },
-  { id: 4, desc: 'ポイントに応じてロールも付与できます' },
+  { id: 4, desc: '(今後追加予定)ポイントに応じてロールを付与' },
 ]
 
 interface PackageTierProps {

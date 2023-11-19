@@ -54,7 +54,7 @@ const ArticleList = () => {
     <Container maxW={'7xl'} p="12">
       <Divider marginTop="5"/>
       <VStack paddingTop="40px" spacing="2" alignItems="flex-start">
-        <Heading as="h2">Botの使い方</Heading>
+        <Heading as="h2">Botを導入した後は</Heading>
         <Text as="p" fontSize="lg">
           以下のURLをご確認下さい。<br/>
           <Link
