@@ -12,7 +12,7 @@ export const metadata = {
   description: "ガチャを回そう！Discordで使えるガチャボットです。",
   openGraph: {
     images: {
-      url: "/ogp.png",
+      url: `${process.env.NEXT_PUBLIC_FE_URL}/ogp.png`,
     },
   },
   twitter: {
