@@ -27,54 +27,67 @@ export default async function Index({
     )
   }
 
-  // サーバーを取得します
-  const serverRes = await getServer({
-    serverId: serverId,
-    accessToken: session.access_token,
-  })
+  try {
+    // サーバーを取得します
+    const serverRes = await getServer({
+      serverId: serverId,
+      accessToken: session.access_token,
+    })
 
-  let buttonOrText
-  if (serverRes.subscriber_id) {
-    // サブスクライバー(支払い者)には、カスタマーポータルを表示します
-    if (serverRes.is_subscriber) {
-      buttonOrText = (
-        <>
-          <CustomerPortalButton
-            serverId={serverId}
-            accessToken={session?.access_token || ""}
-          />
+    let buttonOrText
+    if (serverRes.subscriber_id) {
+      // サブスクライバー(支払い者)には、カスタマーポータルを表示します
+      if (serverRes.is_subscriber) {
+        buttonOrText = (
+          <>
+            <CustomerPortalButton
+              serverId={serverId}
+              accessToken={session?.access_token || ""}
+            />
+            <Text mt={5}>
+              ✅ 機能が使用できます。<br/>
+              ※お支払い情報は本人しか閲覧できません。
+            </Text>
+          </>
+        )
+      } else {
+        buttonOrText = (
           <Text mt={5}>
             ✅ 機能が使用できます。<br/>
             ※お支払い情報は本人しか閲覧できません。
           </Text>
-        </>
-      )
+        )
+      }
     } else {
+      // サブスクライバー(支払い者)でない場合は、チェックアウトを表示します
       buttonOrText = (
-        <Text mt={5}>
-          ✅ 機能が使用できます。<br/>
-          ※お支払い情報は本人しか閲覧できません。
-        </Text>
+        <CheckoutButton
+          serverId={serverId}
+          accessToken={session?.access_token || ""}
+        />
       )
     }
-  } else {
-    // サブスクライバー(支払い者)でない場合は、チェックアウトを表示します
-    buttonOrText = (
-      <CheckoutButton
-        serverId={serverId}
-        accessToken={session?.access_token || ""}
-      />
+
+    return (
+      <>
+        <Header isLogin={true} displayLoginButton={true} serverId={serverId}/>
+        <Container mt={10}>
+          <Heading>Dashboard</Heading>
+          <Text mt={5}>お支払い情報を表示します。</Text>
+          {buttonOrText}
+        </Container>
+      </>
+    )
+  } catch (error) {
+    console.error(error)
+
+    return (
+      <>
+        <Header isLogin={true} displayLoginButton={true} serverId={serverId}/>
+        <Center mt={20}>
+          エラーが発生しました。管理者以外はアクセスできません。
+        </Center>
+      </>
     )
   }
-
-  return (
-    <>
-      <Header isLogin={true} displayLoginButton={true} serverId={serverId}/>
-      <Container mt={10}>
-        <Heading>Dashboard</Heading>
-        <Text mt={5}>お支払い情報を表示します。</Text>
-        {buttonOrText}
-      </Container>
-    </>
-  )
 }
