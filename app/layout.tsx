@@ -9,7 +9,17 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: 'Gacha-bot',
-  description: 'ガチャを回そう！',
+  description: "ガチャを回そう！Discordで使えるガチャボットです。",
+  openGraph: {
+    images: {
+      url: "/ogp.png",
+    },
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gacha-bot",
+    description: "ガチャを回そう！Discordで使えるガチャボットです。",
+  },
 }
 
 export default function RootLayout({
