@@ -241,6 +241,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
         setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
         buttonStyle={panelStore.button.style}
         setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
+        isPanel={true}
       />
 
       {/* Open */}

@@ -3,6 +3,7 @@ import { Box, Center, HStack, IconButton, Image, Input, Textarea, VStack } from 
 import ButtonDrawer from "@/components/embed/ButtonDrawer";
 import { FaTrashAlt } from "react-icons/fa";
 import { ButtonStyle } from "@/utils/api/body";
+import PointCheckButtonDrawer from "@/components/embed/PointCheckButtonDrawer";
 
 type Props = {
   title: string;
@@ -15,6 +16,7 @@ type Props = {
   setButtonLabel?: (buttonLabel: string) => void;
   buttonStyle?: ButtonStyle;
   setButtonStyle?: (buttonColor: ButtonStyle) => void;
+  isPanel?: boolean;
 }
 
 /**
@@ -117,13 +119,16 @@ function DiscordEmbedUI(props: Props) {
         </Box>
 
         {props.buttonLabel && props.buttonStyle && (
-          <HStack justifyContent="flex-start">
+          <HStack justifyContent="flex-start" spacing={4}>
             <ButtonDrawer
               label={props.buttonLabel}
               setLabel={(label) => props.setButtonLabel!(label)}
               style={props.buttonStyle}
               setStyle={(color) => props.setButtonStyle!(color)}
             />
+            {props.isPanel && (
+              <PointCheckButtonDrawer/>
+            )}
           </HStack>
         )}
       </VStack>
