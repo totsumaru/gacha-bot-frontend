@@ -196,7 +196,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
 
   // ResultのEmbedを追加します
   const addResultEmbedUI = () => {
-    if (resultStore.results.length < 10) { // MAXは10
+    if (resultStore.results.length < 30) { // MAXは30
       resultStore.addResult({
         title: "",
         description: "",
@@ -206,7 +206,6 @@ export default function Client({ gachaRes, accessToken }: Props) {
       });
     }
   };
-
 
   // 特定のResult Embedを削除します
   const removeResultEmbedUI = (index: number) => {
@@ -326,7 +325,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
             )}
           </Box>
         ))}
-        {resultStore.results.length < 10 && (
+        {resultStore.results.length < 30 && (
           <IconButton
             aria-label="Add Embed UI"
             icon={<FaPlus/>}
