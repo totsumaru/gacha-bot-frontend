@@ -158,7 +158,7 @@ export const useResultStore = create<resultStoreState>((set, get) => ({
 }));
 
 interface roleStore {
-  role_id: string
+  id: string
   point: number
 }
 
@@ -175,15 +175,16 @@ interface roleStoreState {
 export const useRoleStore = create<roleStoreState>((set, get) => ({
   roles: [],
   init: (roles: roleStore[]) => {
+    if (!roles) return;
     const newRoles = roles.map(role => ({
-      role_id: role.role_id,
+      id: role.id,
       point: role.point,
     }));
     set({ roles: newRoles });
   },
   setRoleID: (index: number, role_id: string) => {
     const newRoles = [...get().roles];
-    newRoles[index].role_id = role_id;
+    newRoles[index].id = role_id;
     set({ roles: newRoles });
   },
   setPoint: (index: number, point: number) => {

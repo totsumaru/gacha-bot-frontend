@@ -50,6 +50,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
     panelStore.init(gachaRes.panel);
     openStore.init(gachaRes.open);
     resultStore.init(gachaRes.result);
+    roleStore.init(gachaRes.roles);
   }, []);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -178,6 +179,12 @@ export default function Client({ gachaRes, accessToken }: Props) {
             point: res.point,
             probability: res.probability,
           };
+        }),
+        roles: roleStore.roles.map((store) => {
+          return {
+            id: store.id,
+            point: store.point,
+          }
         })
       };
 
@@ -399,7 +406,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
                 <Select
                   flex="1"
                   minWidth="120px"
-                  value={res.role_id}
+                  value={res.id}
                   ml={3}
                   placeholder='ロールを選択'
                   backgroundColor={"white"}
@@ -432,7 +439,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
                 aria-label="Add Embed UI"
                 icon={<FaPlus/>}
                 onClick={() => {
-                  roleStore.addRole({ point: 1, role_id: "", })
+                  roleStore.addRole({ point: 1, id: "", })
                 }}
                 alignSelf="center"
                 bg="teal"
