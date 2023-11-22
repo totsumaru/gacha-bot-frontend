@@ -1,6 +1,8 @@
 "use client"
 
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Container,
@@ -366,12 +368,14 @@ export default function Client({ gachaRes, accessToken }: Props) {
                   <ListItem>
                     下位のロールは付与したまま、上位のロールも追加で付与されます。
                   </ListItem>
-                  <ListItem>
-                    ※ロールが付与できない場合、bot自身のロールが、付与するロールより上位にあることを確認してください。
-                  </ListItem>
                 </UnorderedList>
               </Stack>
             </Box>
+
+            <Alert status='error' mt={3} fontSize={"sm"}>
+              <AlertIcon/>
+              ※「bot自身のロール」が「付与するロール」より上位にあることを確認してください。
+            </Alert>
 
             {roleStore.roles.map((res, index) => (
               <Flex
