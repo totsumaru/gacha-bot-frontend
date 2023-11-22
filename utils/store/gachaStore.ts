@@ -156,3 +156,49 @@ export const useResultStore = create<resultStoreState>((set, get) => ({
     set({ results: filteredResults });
   }
 }));
+
+interface roleStore {
+  role_id: string
+  point: number
+}
+
+interface roleStoreState {
+  roles: roleStore[];
+  init: (roles: roleStore[]) => void;
+  setRoleID: (index: number, role_id: string) => void;
+  setPoint: (index: number, point: number) => void;
+  addRole: (newRole: roleStore) => void
+  removeRole: (index: number) => void;
+}
+
+// Roleのstoreです
+export const useRoleStore = create<roleStoreState>((set, get) => ({
+  roles: [],
+  init: (roles: roleStore[]) => {
+    const newRoles = roles.map(role => ({
+      role_id: role.role_id,
+      point: role.point,
+    }));
+    set({ roles: newRoles });
+  },
+  setRoleID: (index: number, role_id: string) => {
+    const newRoles = [...get().roles];
+    newRoles[index].role_id = role_id;
+    set({ roles: newRoles });
+  },
+  setPoint: (index: number, point: number) => {
+    const newRoles = [...get().roles];
+    newRoles[index].point = point;
+    set({ roles: newRoles });
+  },
+  // 新しいResultを追加する関数
+  addRole: (newRole: roleStore) => {
+    const currentResults = get().roles;
+    set({ roles: [...currentResults, newRole] });
+  },
+  // 特定のIndexのResultを削除する関数
+  removeRole: (index: number) => {
+    const filteredRoles = get().roles.filter((_, i) => i !== index);
+    set({ roles: filteredRoles });
+  }
+}));

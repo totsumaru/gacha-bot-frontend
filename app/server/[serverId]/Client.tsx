@@ -6,11 +6,23 @@ import {
   Container,
   Flex,
   IconButton,
+  ListItem,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
+  NumberInputStepper,
+  Select,
   Spinner,
+  Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
-  useToast
+  UnorderedList,
+  useToast,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from "react";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
@@ -18,7 +30,7 @@ import { FaPlus, FaTrash } from "react-icons/fa";
 import { GachaReq, GachaRes } from "@/utils/api/body";
 import { uploadImages } from "@/utils/api/upload_images";
 import { upsertGacha } from "@/utils/api/upsert_gacha";
-import { useOpenStore, usePanelStore, useResultStore } from "@/utils/store/gachaStore";
+import { useOpenStore, usePanelStore, useResultStore, useRoleStore } from "@/utils/store/gachaStore";
 
 type Props = {
   accessToken: string
@@ -32,6 +44,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
   const panelStore = usePanelStore();
   const openStore = useOpenStore();
   const resultStore = useResultStore();
+  const roleStore = useRoleStore();
 
   useEffect(() => {
     panelStore.init(gachaRes.panel);
@@ -194,6 +207,14 @@ export default function Client({ gachaRes, accessToken }: Props) {
     }
   };
 
+  // Roleを追加します
+  const addRole = () => {
+    roleStore.addRole({
+      point: 1,
+      role_id: "",
+    });
+  };
+
   // ResultのEmbedを追加します
   const addResultEmbedUI = () => {
     if (resultStore.results.length < 30) { // MAXは30
@@ -205,6 +226,11 @@ export default function Client({ gachaRes, accessToken }: Props) {
         point: 0,
       });
     }
+  };
+
+  // 特定のRoleを削除します
+  const removeRole = (index: number) => {
+    roleStore.removeRole(index);
   };
 
   // 特定のResult Embedを削除します
@@ -223,121 +249,211 @@ export default function Client({ gachaRes, accessToken }: Props) {
   };
 
   return (
-    <Container mt={10} pb={20}>
-      {/* パネル */}
-      <Text fontSize='xl' fontWeight="bold">1. ガチャのパネル</Text>
-      <Text fontSize='base' mb={3}>
-        常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
-      </Text>
-      <DiscordEmbedUI
-        title={panelStore.title}
-        setTitle={(title) => panelStore.setTitle(title)}
-        description={panelStore.description}
-        setDescription={(description) => panelStore.setDescription(description)}
-        file={panelStore.image}
-        setFile={(image) => panelStore.setImage(image)}
-        buttonLabel={panelStore.button.label}
-        setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
-        buttonStyle={panelStore.button.style}
-        setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
-        isPanel={true}
-      />
-
-      {/* Open */}
-      <Text fontSize='xl' mt={5} fontWeight="bold">2. ガチャをOPEN</Text>
-      <Text fontSize='base' mb={3}>
-        Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
-      </Text>
-      <DiscordEmbedUI
-        title={openStore.title}
-        setTitle={(title) => openStore.setTitle(title)}
-        description={openStore.description}
-        setDescription={(description) => openStore.setDescription(description)}
-        file={openStore.image}
-        setFile={(image) => openStore.setImage(image)}
-        buttonLabel={openStore.button.label}
-        setButtonLabel={(buttonLabel) => openStore.setButtonLabel(buttonLabel)}
-        buttonStyle={openStore.button.style}
-        setButtonStyle={(buttonColor) => openStore.setButtonStyle(buttonColor)}
-      />
-
-      {/* Result */}
-      <Text fontSize='xl' mt={5} fontWeight="bold">3. 結果を表示</Text>
-      <Text fontSize='base' mb={3}>
-        登録された結果の中から、確率に応じてランダムで表示されます。
-        それぞれの表示確率を設定できますが、<b>全ての合計が「100(%)」</b>になるようにしてください。
-        ポイントは、その結果になった時に得られるポイントです。
-      </Text>
-
-      {/* EmbedUIの追加と表示 */}
-      <Flex overflowX="scroll" pb={3}>
-        {resultStore.results.map((res, index) => (
-          <Box key={index} mx={2} minWidth="300px">
+    <Container pt={8} pb={20}>
+      <Tabs variant='enclosed'>
+        <TabList>
+          <Tab>ガチャの内容</Tab>
+          <Tab>ロール設定</Tab>
+        </TabList>
+        <TabPanels>
+          {/* ガチャの内容 */}
+          <TabPanel pt={8}>
+            {/* パネル */}
+            <Text fontSize='xl' fontWeight="bold">1. ガチャのパネル</Text>
+            <Text fontSize='base' mb={3}>
+              常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
+            </Text>
             <DiscordEmbedUI
-              title={res.title}
-              setTitle={(title) => resultStore.setTitle(index, title)}
-              description={res.description}
-              setDescription={(description) => resultStore.setDescription(index, description)}
-              file={res.image}
-              setFile={(image) => resultStore.setImage(index, image)}
-              // 確率とポイントの更新関数
+              title={panelStore.title}
+              setTitle={(title) => panelStore.setTitle(title)}
+              description={panelStore.description}
+              setDescription={(description) => panelStore.setDescription(description)}
+              file={panelStore.image}
+              setFile={(image) => panelStore.setImage(image)}
+              buttonLabel={panelStore.button.label}
+              setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
+              buttonStyle={panelStore.button.style}
+              setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
+              isPanel={true}
             />
-            <Flex direction="column" mt={2} pb={1}>
-              <Flex alignItems="center">
-                <Text mr={2}>確率:</Text>
-                <NumberInput
-                  placeholder="確率"
-                  value={res.probability}
-                  onChange={(e) => updateEmbedUIProbability(index, Number(e))}
-                  width="80px" // インプットフィールドのサイズ調整
-                  bg={"gray.200"}
-                  rounded={"md"}
-                >
-                  <NumberInputField/>
-                </NumberInput>
-                <Text ml={1}>%</Text>
-              </Flex>
-              <Flex alignItems="center" mt={2}>
-                <Text mr={2}>ポイント:</Text>
-                <NumberInput
-                  placeholder="ポイント"
-                  value={res.point}
-                  onChange={(e) => updateEmbedUIPoints(index, Number(e))}
-                  width="80px" // インプットフィールドのサイズ調整
-                  bg={"gray.200"}
-                  rounded={"md"}
-                >
-                  <NumberInputField/>
-                </NumberInput>
-                <Text ml={1}>pt</Text>
-              </Flex>
-            </Flex>
-            {resultStore.results.length > 1 && (
-              <IconButton
-                aria-label="Delete Embed UI"
-                icon={<FaTrash/>}
-                onClick={() => removeResultEmbedUI(index)}
-                alignSelf="center"
-                bg="red.400"
-                textColor="white"
-                size="sm"
-              />
-            )}
-          </Box>
-        ))}
-        {resultStore.results.length < 30 && (
-          <IconButton
-            aria-label="Add Embed UI"
-            icon={<FaPlus/>}
-            onClick={addResultEmbedUI}
-            alignSelf="center"
-            bg="teal"
-            textColor="white"
-          />
-        )}
-      </Flex>
-      <Text fontWeight="bold" mt={3}>確率の合計: {totalProbability}%</Text>
 
+            {/* Open */}
+            <Text fontSize='xl' mt={5} fontWeight="bold">2. ガチャをOPEN</Text>
+            <Text fontSize='base' mb={3}>
+              Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
+            </Text>
+            <DiscordEmbedUI
+              title={openStore.title}
+              setTitle={(title) => openStore.setTitle(title)}
+              description={openStore.description}
+              setDescription={(description) => openStore.setDescription(description)}
+              file={openStore.image}
+              setFile={(image) => openStore.setImage(image)}
+              buttonLabel={openStore.button.label}
+              setButtonLabel={(buttonLabel) => openStore.setButtonLabel(buttonLabel)}
+              buttonStyle={openStore.button.style}
+              setButtonStyle={(buttonColor) => openStore.setButtonStyle(buttonColor)}
+            />
+
+            {/* Result */}
+            <Text fontSize='xl' mt={5} fontWeight="bold">3. 結果を表示</Text>
+            <Text fontSize='base' mb={3}>
+              登録された結果の中から、確率に応じてランダムで表示されます。
+              それぞれの表示確率を設定できますが、<b>全ての合計が「100(%)」</b>になるようにしてください。
+              ポイントは、その結果になった時に得られるポイントです。
+            </Text>
+
+            {/* EmbedUIの追加と表示 */}
+            <Flex overflowX="scroll" pb={3}>
+              {resultStore.results.map((res, index) => (
+                <Box key={index} mx={2} minWidth="300px">
+                  <DiscordEmbedUI
+                    title={res.title}
+                    setTitle={(title) => resultStore.setTitle(index, title)}
+                    description={res.description}
+                    setDescription={(description) => resultStore.setDescription(index, description)}
+                    file={res.image}
+                    setFile={(image) => resultStore.setImage(index, image)}
+                    // 確率とポイントの更新関数
+                  />
+                  <Flex direction="column" mt={2} pb={1}>
+                    <Flex alignItems="center">
+                      <Text mr={2}>確率:</Text>
+                      <NumberInput
+                        placeholder="確率"
+                        value={res.probability}
+                        onChange={(e) => updateEmbedUIProbability(index, Number(e))}
+                        width="80px" // インプットフィールドのサイズ調整
+                        bg={"gray.200"}
+                        rounded={"md"}
+                      >
+                        <NumberInputField/>
+                      </NumberInput>
+                      <Text ml={1}>%</Text>
+                    </Flex>
+                    <Flex alignItems="center" mt={2}>
+                      <Text mr={2}>ポイント:</Text>
+                      <NumberInput
+                        placeholder="ポイント"
+                        value={res.point}
+                        onChange={(e) => updateEmbedUIPoints(index, Number(e))}
+                        width="80px" // インプットフィールドのサイズ調整
+                        bg={"gray.200"}
+                        rounded={"md"}
+                      >
+                        <NumberInputField/>
+                      </NumberInput>
+                      <Text ml={1}>pt</Text>
+                    </Flex>
+                  </Flex>
+                  {resultStore.results.length > 1 && (
+                    <IconButton
+                      aria-label="Delete Embed UI"
+                      icon={<FaTrash/>}
+                      onClick={() => removeResultEmbedUI(index)}
+                      alignSelf="center"
+                      bg="red.400"
+                      textColor="white"
+                      size="sm"
+                    />
+                  )}
+                </Box>
+              ))}
+              {resultStore.results.length < 30 && (
+                <IconButton
+                  aria-label="Add Embed UI"
+                  icon={<FaPlus/>}
+                  onClick={addResultEmbedUI}
+                  alignSelf="center"
+                  bg="teal"
+                  textColor="white"
+                />
+              )}
+            </Flex>
+            <Text fontWeight="bold" mt={3}>確率の合計: {totalProbability}%</Text>
+          </TabPanel>
+          {/* ロールタブ */}
+          <TabPanel>
+            <Box backgroundColor={"gray.100"} p={3}>
+              <Stack spacing={1}>
+                <UnorderedList fontSize='sm' styleType="disc"> {/* スタイルタイプを設定 */}
+                  <ListItem>
+                    特定のポイント以上になったら、ロールを付与することができます。
+                  </ListItem>
+                  <ListItem>
+                    下位のロールは付与したまま、上位のロールも追加で付与されます。
+                  </ListItem>
+                  <ListItem>
+                    ※ロールが付与できない場合、bot自身のロールが、付与するロールより上位にあることを確認してください。
+                  </ListItem>
+                </UnorderedList>
+              </Stack>
+            </Box>
+
+            {roleStore.roles.map((res, index) => (
+              <Flex
+                mt={5}
+                p={3}
+                alignItems="center"
+                wrap="wrap"
+                backgroundColor="gray.50"
+                border="1px" // ボーダーの厚さを指定
+                borderColor="gray.200" // ボーダーの色を指定
+                borderRadius="md" // ボーダーの角を丸める（必要に応じて）
+              >
+                <NumberInput size='md' maxW={20} defaultValue={1} min={1} mr={3}>
+                  <NumberInputField value={res.point} backgroundColor={"white"}/>
+                  <NumberInputStepper>
+                    <NumberIncrementStepper/>
+                    <NumberDecrementStepper/>
+                  </NumberInputStepper>
+                </NumberInput>
+                <Text whiteSpace="nowrap"> {/* テキストが折り返されないように設定 */}
+                  ptで
+                </Text>
+                <Select
+                  flex="1"
+                  minWidth="120px"
+                  value={res.role_id}
+                  ml={3}
+                  placeholder='ロールを選択'
+                  backgroundColor={"white"}
+                >
+                  <option value='option1'>Option 1aaaaaaaaaaaaaaaaaaaaaaa</option>
+                  <option value='option2'>Option 2</option>
+                  <option value='option3'>Option 3</option>
+                </Select>
+                <Box ml={2}>
+                  {/* ロールの削除ボタン */}
+                  <IconButton
+                    aria-label="Delete Embed UI"
+                    icon={<FaTrash/>}
+                    onClick={() => removeRole(index)}
+                    alignSelf="center"
+                    bg="red.400"
+                    textColor="white"
+                    size="sm"
+                  />
+                </Box>
+              </Flex>
+            ))}
+
+            {/* 追加ボタン */}
+            <Box mt={3}>
+              <IconButton
+                aria-label="Add Embed UI"
+                icon={<FaPlus/>}
+                onClick={addRole}
+                alignSelf="center"
+                bg="teal"
+                textColor="white"
+              />
+            </Box>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+
+      {/* 保存ボタン */}
       <Flex justifyContent="flex-end" mt={3}>
         <Button
           colorScheme="teal"

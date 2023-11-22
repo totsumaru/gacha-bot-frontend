@@ -46,3 +46,9 @@ export interface ButtonReq {
   label: string;
   style: ButtonStyle;
 }
+
+// ロールのリクエスト
+export interface RoleReq {
+  id: string;
+  point: number;
+}
