@@ -50,7 +50,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
     panelStore.init(gachaRes.panel);
     openStore.init(gachaRes.open);
     resultStore.init(gachaRes.result);
-    roleStore.init(gachaRes.roles);
+    roleStore.init(gachaRes.role);
   }, []);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -180,7 +180,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
             probability: res.probability,
           };
         }),
-        roles: roleStore.roles.map((store) => {
+        role: roleStore.roles.map((store) => {
           return {
             id: store.id,
             point: store.point,
@@ -412,7 +412,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
                   backgroundColor={"white"}
                   onChange={(e) => roleStore.setRoleID(index, e.target.value)}
                 >
-                  {gachaRes.all_roles && gachaRes.all_roles.map((role, index) => (
+                  {gachaRes.all_role && gachaRes.all_role.map((role, index) => (
                     <option key={index} value={role.id || "error"}>
                       {role.name || "ロールが取得できませんでした"}
                     </option>

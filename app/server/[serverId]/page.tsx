@@ -50,8 +50,8 @@ export default async function Index({
               panel: gacha.panel,
               open: gacha.open,
               result: gacha.result,
-              roles: gacha.roles,
-              all_roles: gacha.all_roles,
+              role: gacha.role,
+              all_role: gacha.all_role,
             }}
           />
         ) : (

@@ -12,8 +12,8 @@ export interface GachaRes {
   panel: EmbedReq;
   open: EmbedReq
   result: ResultReq[];
-  roles: RoleWithPointRes[];
-  all_roles: RoleRes[];
+  role: RoleWithPointRes[];
+  all_role: RoleRes[];
 }
 
 // ガチャのリクエスト
@@ -23,7 +23,7 @@ export interface GachaReq {
   panel: EmbedReq;
   open: EmbedReq
   result: ResultReq[];
-  roles: RoleWithPointReq[];
+  role: RoleWithPointReq[];
 }
 
 // 結果のリクエスト
