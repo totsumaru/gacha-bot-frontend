@@ -12,6 +12,7 @@ export interface GachaRes {
   panel: EmbedReq;
   open: EmbedReq
   result: ResultReq[];
+  all_roles: RoleRes[];
 }
 
 // ガチャのリクエスト
@@ -48,7 +49,20 @@ export interface ButtonReq {
 }
 
 // ロールのリクエスト
-export interface RoleReq {
+export interface RoleWithPointReq {
   id: string;
   point: number;
+}
+
+// ロールのレスポンス
+export interface RoleWithPointRes {
+  id: string;
+  name: string;
+  point: number;
+}
+
+// 全てのロール
+export interface RoleRes {
+  id: string;
+  name: string;
 }

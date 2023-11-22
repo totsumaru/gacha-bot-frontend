@@ -207,14 +207,6 @@ export default function Client({ gachaRes, accessToken }: Props) {
     }
   };
 
-  // Roleを追加します
-  const addRole = () => {
-    roleStore.addRole({
-      point: 1,
-      role_id: "",
-    });
-  };
-
   // ResultのEmbedを追加します
   const addResultEmbedUI = () => {
     if (resultStore.results.length < 30) { // MAXは30
@@ -226,26 +218,6 @@ export default function Client({ gachaRes, accessToken }: Props) {
         point: 0,
       });
     }
-  };
-
-  // 特定のRoleを削除します
-  const removeRole = (index: number) => {
-    roleStore.removeRole(index);
-  };
-
-  // 特定のResult Embedを削除します
-  const removeResultEmbedUI = (index: number) => {
-    if (resultStore.results.length > 1) { // 最低数は1
-      resultStore.removeResult(index);
-    }
-  };
-
-  const updateEmbedUIProbability = (index: number, probability: number) => {
-    resultStore.setProbability(index, probability);
-  };
-
-  const updateEmbedUIPoints = (index: number, points: number) => {
-    resultStore.setPoint(index, points);
   };
 
   return (
@@ -322,7 +294,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
                       <NumberInput
                         placeholder="確率"
                         value={res.probability}
-                        onChange={(e) => updateEmbedUIProbability(index, Number(e))}
+                        onChange={(e) => resultStore.setProbability(index, Number(e))}
                         width="80px" // インプットフィールドのサイズ調整
                         bg={"gray.200"}
                         rounded={"md"}
@@ -336,7 +308,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
                       <NumberInput
                         placeholder="ポイント"
                         value={res.point}
-                        onChange={(e) => updateEmbedUIPoints(index, Number(e))}
+                        onChange={(e) => resultStore.setPoint(index, Number(e))}
                         width="80px" // インプットフィールドのサイズ調整
                         bg={"gray.200"}
                         rounded={"md"}
@@ -350,7 +322,11 @@ export default function Client({ gachaRes, accessToken }: Props) {
                     <IconButton
                       aria-label="Delete Embed UI"
                       icon={<FaTrash/>}
-                      onClick={() => removeResultEmbedUI(index)}
+                      onClick={() => {
+                        if (resultStore.results.length > 1) { // 最低数は1
+                          resultStore.removeResult(index);
+                        }
+                      }}
                       alignSelf="center"
                       bg="red.400"
                       textColor="white"
@@ -392,6 +368,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
 
             {roleStore.roles.map((res, index) => (
               <Flex
+                key={index}
                 mt={5}
                 p={3}
                 alignItems="center"
@@ -401,8 +378,16 @@ export default function Client({ gachaRes, accessToken }: Props) {
                 borderColor="gray.200" // ボーダーの色を指定
                 borderRadius="md" // ボーダーの角を丸める（必要に応じて）
               >
-                <NumberInput size='md' maxW={20} defaultValue={1} min={1} mr={3}>
-                  <NumberInputField value={res.point} backgroundColor={"white"}/>
+                <NumberInput
+                  size='md'
+                  maxW={20}
+                  defaultValue={1}
+                  min={1}
+                  mr={3}
+                  onChange={(e) => roleStore.setPoint(index, Number(e))}
+                  value={res.point}
+                >
+                  <NumberInputField backgroundColor={"white"}/>
                   <NumberInputStepper>
                     <NumberIncrementStepper/>
                     <NumberDecrementStepper/>
@@ -418,17 +403,20 @@ export default function Client({ gachaRes, accessToken }: Props) {
                   ml={3}
                   placeholder='ロールを選択'
                   backgroundColor={"white"}
+                  onChange={(e) => roleStore.setRoleID(index, e.target.value)}
                 >
-                  <option value='option1'>Option 1aaaaaaaaaaaaaaaaaaaaaaa</option>
-                  <option value='option2'>Option 2</option>
-                  <option value='option3'>Option 3</option>
+                  {gachaRes.all_roles && gachaRes.all_roles.map((role, index) => (
+                    <option key={index} value={role.id || "error"}>
+                      {role.name || "ロールが取得できませんでした"}
+                    </option>
+                  ))}
                 </Select>
                 <Box ml={2}>
                   {/* ロールの削除ボタン */}
                   <IconButton
                     aria-label="Delete Embed UI"
                     icon={<FaTrash/>}
-                    onClick={() => removeRole(index)}
+                    onClick={() => roleStore.removeRole(index)}
                     alignSelf="center"
                     bg="red.400"
                     textColor="white"
@@ -443,7 +431,9 @@ export default function Client({ gachaRes, accessToken }: Props) {
               <IconButton
                 aria-label="Add Embed UI"
                 icon={<FaPlus/>}
-                onClick={addRole}
+                onClick={() => {
+                  roleStore.addRole({ point: 1, role_id: "", })
+                }}
                 alignSelf="center"
                 bg="teal"
                 textColor="white"
