@@ -1,6 +1,6 @@
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { useOpenStore } from "@/utils/store/gachaStore";
-import ButtonDrawer from "@/components/embed/ButtonDrawer";
+import ButtonDrawer from "@/components/embed/buttonDrawer/ButtonDrawer";
 
 /**
  * OpenのEmbedです

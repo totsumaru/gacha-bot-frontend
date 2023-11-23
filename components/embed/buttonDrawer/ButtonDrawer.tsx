@@ -23,6 +23,8 @@ const btnStyleToColor = (style: ButtonStyle) => {
       return "blue";
     case "SUCCESS":
       return "green";
+    case "LINK":
+      return "gray";
   }
 }
 

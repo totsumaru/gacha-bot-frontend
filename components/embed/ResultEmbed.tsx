@@ -1,6 +1,6 @@
 import { useResultStore } from "@/utils/store/gachaStore";
-import ButtonDrawer from "@/components/embed/ButtonDrawer";
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
+import LinkButtonDrawer from "@/components/embed/buttonDrawer/LinkButtonDrawer";
 
 type Props = {
   index: number;
@@ -13,14 +13,18 @@ export default function ResultEmbed({ index }: Props) {
   const resultStore = useResultStore();
 
   const btns = [(
-    <ButtonDrawer
+    <LinkButtonDrawer
       label={resultStore.results[index].button.label}
       setLabel={(label) => resultStore.updateStore(index, {
         button: { ...resultStore.results[index].button, label: label }
       })}
-      style={resultStore.results[index].button.style}
-      setStyle={(color) => resultStore.updateStore(index, {
-        button: { ...resultStore.results[index].button, style: color }
+      url={resultStore.results[index].button.url}
+      setURL={(url) => resultStore.updateStore(index, {
+        button: { ...resultStore.results[index].button, url: url }
+      })}
+      isHidden={resultStore.results[index].button.is_hidden}
+      setIsHidden={(isHidden) => resultStore.updateStore(index, {
+        button: { ...resultStore.results[index].button, is_hidden: isHidden }
       })}
     />
   )]

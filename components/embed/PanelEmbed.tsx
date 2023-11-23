@@ -1,7 +1,7 @@
 import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { usePanelStore } from "@/utils/store/gachaStore";
-import ButtonDrawer from "@/components/embed/ButtonDrawer";
-import PointCheckButtonDrawer from "@/components/embed/PointCheckButtonDrawer";
+import ButtonDrawer from "@/components/embed/buttonDrawer/ButtonDrawer";
+import PointCheckButtonDrawer from "@/components/embed/buttonDrawer/PointCheckButtonDrawer";
 
 /**
  * パネルのEmbedです
