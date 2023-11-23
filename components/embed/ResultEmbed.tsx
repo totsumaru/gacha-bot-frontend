@@ -22,10 +22,9 @@ export default function ResultEmbed({ index }: Props) {
       setURL={(url) => resultStore.updateStore(index, {
         button: { ...resultStore.results[index].button, url: url }
       })}
-      // ここでisEnabledとisHiddenを反転している
-      isEnabled={!resultStore.results[index].button.is_hidden}
-      setIsEnabled={(isEnabled) => resultStore.updateStore(index, {
-        button: { ...resultStore.results[index].button, is_hidden: !isEnabled }
+      isVisible={resultStore.results[index].button.is_visible}
+      setIsVisible={(isVisible) => resultStore.updateStore(index, {
+        button: { ...resultStore.results[index].button, is_visible: isVisible }
       })}
     />
   )]

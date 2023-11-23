@@ -10,7 +10,7 @@ interface embedStore {
     label: string;
     style: ButtonStyle;
     url: string;
-    is_hidden: boolean;
+    is_visible: boolean;
   };
   init: (embedReq: EmbedReq) => void;
   // ストア全体を更新する関数
@@ -36,7 +36,7 @@ export const usePanelStore = create<embedStore>((set) => ({
     label: '',
     style: 'PRIMARY', // 初期値
     url: '',
-    is_hidden: false,
+    is_visible: false,
   },
   updateStore: (update) => {
     set((state) => ({ ...state, ...update }));
@@ -50,7 +50,7 @@ export const usePanelStore = create<embedStore>((set) => ({
         label: embedReq.button[0].label,
         style: embedReq.button[0].style,
         url: "",
-        is_hidden: false,
+        is_visible: false,
       }
     });
   },
@@ -65,7 +65,7 @@ export const useOpenStore = create<embedStore>((set) => ({
     label: "結果を見る",
     style: "PRIMARY",
     url: "",
-    is_hidden: false,
+    is_visible: false,
   },
   updateStore: (update) => {
     set((state) => ({ ...state, ...update }));
@@ -79,7 +79,7 @@ export const useOpenStore = create<embedStore>((set) => ({
         label: embedReq.button[0].label,
         style: embedReq.button[0].style,
         url: "",
-        is_hidden: false,
+        is_visible: false,
       }
     });
   },
@@ -94,7 +94,7 @@ interface resultStore {
     label: string;
     style: ButtonStyle;
     url: string;
-    is_hidden: boolean;
+    is_visible: boolean;
   };
   probability: number;
   point: number;
@@ -124,7 +124,7 @@ export const useResultStore = create<resultStoreState>((set, get) => ({
         label: req.embed.button?.[0]?.label,
         style: req.embed.button?.[0]?.style,
         url: req.embed.button?.[0]?.url,
-        is_hidden: req.embed.button?.[0]?.is_hidden,
+        is_visible: req.embed.button?.[0]?.is_visible,
       },
       probability: req.probability,
       point: req.point,

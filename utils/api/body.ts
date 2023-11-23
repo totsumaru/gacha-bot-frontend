@@ -49,7 +49,7 @@ export interface ButtonReq {
   label: string;
   style: ButtonStyle;
   url: string;
-  is_hidden: boolean;
+  is_visible: boolean;
 }
 
 // ロールのリクエスト
