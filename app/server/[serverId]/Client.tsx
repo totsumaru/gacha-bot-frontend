@@ -173,25 +173,25 @@ export default function Client({ gachaRes, accessToken }: Props) {
             is_hidden: false,
           }],
         },
-        result: resultStore.results.map((res) => {
-          const imageUrl = res.image instanceof File ? uploadedImageUrls.shift() : res.image;
+        result: resultStore.results.map((result) => {
+          const imageUrl = result.image instanceof File ? uploadedImageUrls.shift() : result.image;
           return {
             embed: {
-              title: res.title,
-              description: res.description,
+              title: result.title,
+              description: result.description,
               color: 0,
               image_url: imageUrl || "",
               thumbnail_url: "",
               button: [{
                 kind: "none",
-                label: openStore.button.label,
-                style: openStore.button.style,
-                url: "",
-                is_hidden: false,
+                label: result.button.label,
+                style: result.button.style,
+                url: result.button.url,
+                is_hidden: result.button.is_hidden,
               }],
             },
-            point: res.point,
-            probability: res.probability,
+            point: result.point,
+            probability: result.probability,
           };
         }),
         role: roleStore.roles.map((store) => {
@@ -236,7 +236,7 @@ export default function Client({ gachaRes, accessToken }: Props) {
         description: "",
         image: null,
         button: {
-          label: "+",
+          label: "",
           style: "LINK",
           url: "",
           is_hidden: true,

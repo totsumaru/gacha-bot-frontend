@@ -121,7 +121,7 @@ export const useResultStore = create<resultStoreState>((set, get) => ({
       description: req.embed.description,
       image: req.embed.image_url,
       button: {
-        label: req.embed.button?.[0]?.label || "",
+        label: req.embed.button?.[0]?.label,
         style: req.embed.button?.[0]?.style,
         url: req.embed.button?.[0]?.url,
         is_hidden: req.embed.button?.[0]?.is_hidden,

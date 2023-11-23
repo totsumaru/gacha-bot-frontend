@@ -19,20 +19,21 @@ import {
 } from '@chakra-ui/react';
 import { FaBan } from "react-icons/fa";
 
+// isHiddenはわかりにくいので、このコンポーネントではisEnabledとしている
 type Props = {
   label: string,
   setLabel: (label: string) => void,
   url: string,
   setURL: (url: string) => void,
-  isHidden: boolean,
-  setIsHidden: (isHidden: boolean) => void,
+  isEnabled: boolean,
+  setIsEnabled: (isHidden: boolean) => void,
 }
 
 /**
  * リンクボタンの設定を行うDrawer
  */
 export default function LinkButtonDrawer({
-  label, setLabel, url, setURL, isHidden, setIsHidden,
+  label, setLabel, url, setURL, isEnabled, setIsEnabled,
 }: Props) {
   const btnRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
@@ -40,7 +41,7 @@ export default function LinkButtonDrawer({
 
   // Switchの状態を変更する
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsHidden(!event.target.checked);
+    setIsEnabled(event.target.checked);
   };
 
   // ラベルが変更された時の処理
@@ -65,7 +66,7 @@ export default function LinkButtonDrawer({
   return (
     <>
       <Button ref={btnRef} colorScheme={"gray"} onClick={onOpen}>
-        {isHidden ? <FaBan/> : label}
+        {isEnabled ? label : <FaBan/>}
       </Button>
       <Drawer isOpen={isOpen} placement='right' onClose={onClose} finalFocusRef={btnRef}>
         <DrawerOverlay/>
@@ -78,18 +79,18 @@ export default function LinkButtonDrawer({
             </Text>
 
             <Stack spacing={4}>
-              <Switch size='lg' isChecked={!isHidden} onChange={handleSwitchChange}/>
+              <Switch size='lg' isChecked={isEnabled} onChange={handleSwitchChange}/>
               <Input
                 placeholder='ラベルを入力'
                 value={label}
                 onChange={handleLabelChange}
-                disabled={isHidden}
+                disabled={!isEnabled}
               />
               <Input
                 placeholder='URLを入力'
                 value={url}
                 onChange={handleURLChange}
-                disabled={isHidden}
+                disabled={!isEnabled}
               />
             </Stack>
 
