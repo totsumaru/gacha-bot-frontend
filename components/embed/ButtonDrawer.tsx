@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Drawer,
@@ -41,6 +41,11 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
   const [newLabel, setNewLabel] = useState(label);
   const [newStyle, setNewStyle] = useState(style);
 
+  useEffect(() => {
+    setNewLabel(label);
+    setNewStyle(style)
+  }, [label, style])
+
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewLabel(e.target.value);
   };
@@ -77,7 +82,11 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
           <DrawerHeader>ボタンの設定</DrawerHeader>
 
           <DrawerBody>
-            <Input placeholder='ラベルを入力' value={newLabel} onChange={handleLabelChange}/>
+            <Input
+              placeholder='ラベルを入力'
+              value={newLabel}
+              onChange={handleLabelChange}
+            />
             <HStack spacing={4} mt={4}>
               <IconButton
                 aria-label="Primary color"
