@@ -2,8 +2,8 @@
  * バックエンドに送信するbodyの構造体です
  */
 
-export type ButtonKind = "to_open" | "to_result"
-export type ButtonStyle = "PRIMARY" | "SUCCESS"
+export type ButtonKind = "to_open" | "to_result" | "none"
+export type ButtonStyle = "PRIMARY" | "SUCCESS" | "LINK"
 
 // ガチャのレスポンス
 export interface GachaRes {
@@ -48,6 +48,8 @@ export interface ButtonReq {
   kind: ButtonKind;
   label: string;
   style: ButtonStyle;
+  url: string;
+  is_hidden: boolean;
 }
 
 // ロールのリクエスト

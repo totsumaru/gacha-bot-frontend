@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   Button,
   Drawer,
@@ -11,7 +11,8 @@ import {
   HStack,
   IconButton,
   Input,
-  useDisclosure
+  useDisclosure,
+  useToast
 } from '@chakra-ui/react';
 import { FaCircle } from 'react-icons/fa';
 import { ButtonStyle } from "@/utils/api/body";
@@ -35,34 +36,28 @@ type Props = {
 /**
  * ボタンの設定を行うDrawer
  */
-export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props) {
+export default function ButtonDrawer({
+  label, setLabel, style, setStyle
+}: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const btnRef = useRef<HTMLButtonElement>(null);
-  const [newLabel, setNewLabel] = useState(label);
-  const [newStyle, setNewStyle] = useState(style);
-
-  useEffect(() => {
-    setNewLabel(label);
-    setNewStyle(style)
-  }, [label, style])
+  const toast = useToast();
 
   const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewLabel(e.target.value);
-  };
-
-  const handleSave = () => {
-    // ボタンのラベルが8文字を超えていたらエラーを出す
-    if (newLabel.length > 8) {
-      alert('ボタンのラベルは8文字以内にしてください');
-      return;
+    if (e.target.value.length > 8) {
+      toast({
+        title: "ラベルは8文字以内にしてください",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return
     }
-    setLabel(newLabel);
-    setStyle(newStyle);
-    onClose();
+    setLabel(e.target.value);
   };
 
-  const isSelectedStyle = (style: ButtonStyle) => {
-    return newStyle === style ? 'outline' : 'ghost';
+  const isSelectedStyle = (s: ButtonStyle) => {
+    return style === s ? 'outline' : 'ghost';
   };
 
   return (
@@ -84,7 +79,7 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
           <DrawerBody>
             <Input
               placeholder='ラベルを入力'
-              value={newLabel}
+              value={label}
               onChange={handleLabelChange}
             />
             <HStack spacing={4} mt={4}>
@@ -93,14 +88,14 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
                 icon={<FaCircle/>}
                 colorScheme="blue"
                 variant={isSelectedStyle('PRIMARY')}
-                onClick={() => setNewStyle('PRIMARY')}
+                onClick={() => setStyle('PRIMARY')}
               />
               <IconButton
                 aria-label="Success color"
                 icon={<FaCircle/>}
                 colorScheme="green"
                 variant={isSelectedStyle('SUCCESS')}
-                onClick={() => setNewStyle('SUCCESS')}
+                onClick={() => setStyle('SUCCESS')}
               />
             </HStack>
           </DrawerBody>
@@ -108,9 +103,6 @@ export default function ButtonDrawer({ label, setLabel, style, setStyle }: Props
           <DrawerFooter>
             <Button variant='outline' mr={3} onClick={onClose}>
               閉じる
-            </Button>
-            <Button colorScheme='teal' onClick={handleSave}>
-              保存
             </Button>
           </DrawerFooter>
         </DrawerContent>

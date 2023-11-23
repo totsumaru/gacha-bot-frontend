@@ -27,12 +27,14 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from "react";
-import DiscordEmbedUI from "@/components/embed/DiscordEmbedUI";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { GachaReq, GachaRes } from "@/utils/api/body";
 import { uploadImages } from "@/utils/api/upload_images";
 import { upsertGacha } from "@/utils/api/upsert_gacha";
 import { useOpenStore, usePanelStore, useResultStore, useRoleStore } from "@/utils/store/gachaStore";
+import PanelEmbed from "@/components/embed/PanelEmbed";
+import OpenEmbed from "@/components/embed/OpenEmbed";
+import ResultEmbed from "@/components/embed/ResultEmbed";
 
 type Props = {
   accessToken: string
@@ -153,6 +155,8 @@ export default function Client({ gachaRes, accessToken }: Props) {
             kind: "to_open",
             label: panelStore.button.label,
             style: panelStore.button.style,
+            url: "",
+            is_hidden: false,
           }],
         },
         open: {
@@ -165,6 +169,8 @@ export default function Client({ gachaRes, accessToken }: Props) {
             kind: "to_result",
             label: openStore.button.label,
             style: openStore.button.style,
+            url: "",
+            is_hidden: false,
           }],
         },
         result: resultStore.results.map((res) => {
@@ -176,7 +182,13 @@ export default function Client({ gachaRes, accessToken }: Props) {
               color: 0,
               image_url: imageUrl || "",
               thumbnail_url: "",
-              button: [],
+              button: [{
+                kind: "none",
+                label: openStore.button.label,
+                style: openStore.button.style,
+                url: "",
+                is_hidden: false,
+              }],
             },
             point: res.point,
             probability: res.probability,
@@ -223,6 +235,12 @@ export default function Client({ gachaRes, accessToken }: Props) {
         title: "",
         description: "",
         image: null,
+        button: {
+          label: "+",
+          style: "LINK",
+          url: "",
+          is_hidden: true,
+        },
         probability: 0,
         point: 0,
       });
@@ -244,37 +262,16 @@ export default function Client({ gachaRes, accessToken }: Props) {
             <Text fontSize='base' mb={3}>
               常に表示させておくメッセージ（パネル）です。「!gacha-panel」というコマンドで表示されます。
             </Text>
-            <DiscordEmbedUI
-              title={panelStore.title}
-              setTitle={(title) => panelStore.setTitle(title)}
-              description={panelStore.description}
-              setDescription={(description) => panelStore.setDescription(description)}
-              file={panelStore.image}
-              setFile={(image) => panelStore.setImage(image)}
-              buttonLabel={panelStore.button.label}
-              setButtonLabel={(btnLabel) => panelStore.setButtonLabel(btnLabel)}
-              buttonStyle={panelStore.button.style}
-              setButtonStyle={(btnStyle) => panelStore.setButtonStyle(btnStyle)}
-              isPanel={true}
-            />
+            {/* パネルのEmbed */}
+            <PanelEmbed/>
 
             {/* Open */}
             <Text fontSize='xl' mt={5} fontWeight="bold">2. ガチャをOPEN</Text>
             <Text fontSize='base' mb={3}>
               Panelのボタンが押された時に表示されます。ガチャガチャでカプセルが出た状態です。
             </Text>
-            <DiscordEmbedUI
-              title={openStore.title}
-              setTitle={(title) => openStore.setTitle(title)}
-              description={openStore.description}
-              setDescription={(description) => openStore.setDescription(description)}
-              file={openStore.image}
-              setFile={(image) => openStore.setImage(image)}
-              buttonLabel={openStore.button.label}
-              setButtonLabel={(buttonLabel) => openStore.setButtonLabel(buttonLabel)}
-              buttonStyle={openStore.button.style}
-              setButtonStyle={(buttonColor) => openStore.setButtonStyle(buttonColor)}
-            />
+            {/* OpenのEmbed */}
+            <OpenEmbed/>
 
             {/* Result */}
             <Text fontSize='xl' mt={5} fontWeight="bold">3. 結果を表示</Text>
@@ -288,22 +285,17 @@ export default function Client({ gachaRes, accessToken }: Props) {
             <Flex overflowX="scroll" pb={3}>
               {resultStore.results.map((res, index) => (
                 <Box key={index} mx={2} minWidth="300px">
-                  <DiscordEmbedUI
-                    title={res.title}
-                    setTitle={(title) => resultStore.setTitle(index, title)}
-                    description={res.description}
-                    setDescription={(description) => resultStore.setDescription(index, description)}
-                    file={res.image}
-                    setFile={(image) => resultStore.setImage(index, image)}
-                    // 確率とポイントの更新関数
-                  />
+                  <ResultEmbed index={index}/>
+
                   <Flex direction="column" mt={2} pb={1}>
                     <Flex alignItems="center">
                       <Text mr={2}>確率:</Text>
                       <NumberInput
                         placeholder="確率"
                         value={res.probability}
-                        onChange={(e) => resultStore.setProbability(index, Number(e))}
+                        onChange={(e) => resultStore.updateStore(index, {
+                          probability: Number(e),
+                        })}
                         width="80px" // インプットフィールドのサイズ調整
                         bg={"gray.200"}
                         rounded={"md"}
@@ -317,7 +309,9 @@ export default function Client({ gachaRes, accessToken }: Props) {
                       <NumberInput
                         placeholder="ポイント"
                         value={res.point}
-                        onChange={(e) => resultStore.setPoint(index, Number(e))}
+                        onChange={(e) => resultStore.updateStore(index, {
+                          point: Number(e)
+                        })}
                         width="80px" // インプットフィールドのサイズ調整
                         bg={"gray.200"}
                         rounded={"md"}
@@ -395,7 +389,9 @@ export default function Client({ gachaRes, accessToken }: Props) {
                   defaultValue={1}
                   min={1}
                   mr={3}
-                  onChange={(e) => roleStore.setPoint(index, Number(e))}
+                  onChange={(e) => roleStore.updateStore(index, {
+                    point: Number(e)
+                  })}
                   value={res.point}
                 >
                   <NumberInputField backgroundColor={"white"}/>
@@ -414,7 +410,9 @@ export default function Client({ gachaRes, accessToken }: Props) {
                   ml={3}
                   placeholder='ロールを選択'
                   backgroundColor={"white"}
-                  onChange={(e) => roleStore.setRoleID(index, e.target.value)}
+                  onChange={(e) => roleStore.updateStore(index, {
+                    id: e.target.value
+                  })}
                 >
                   {gachaRes.all_role && gachaRes.all_role.map((role, index) => (
                     <option key={index} value={role.id || "error"}>

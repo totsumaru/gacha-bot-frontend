@@ -1,25 +1,46 @@
 import { create } from "zustand";
-import { EmbedReq, ResultReq } from "@/utils/api/body";
+import { ButtonStyle, EmbedReq, ResultReq } from "@/utils/api/body";
 
 // EmbedのStoreの型です
 interface embedStore {
-  init: (embedReq: EmbedReq) => void;
   title: string;
-  setTitle: (title: string) => void;
   description: string;
-  setDescription: (description: string) => void;
   image: string | File | null;
-  setImage: (image: string | File | null) => void;
   button: {
     label: string;
-    style: "PRIMARY" | "SUCCESS";
-  }
-  setButtonLabel: (label: string) => void;
-  setButtonStyle: (style: "PRIMARY" | "SUCCESS") => void;
+    style: ButtonStyle;
+    url: string;
+    is_hidden: boolean;
+  };
+  init: (embedReq: EmbedReq) => void;
+  // ストア全体を更新する関数
+  updateStore: (update: Partial<embedStore>) => void;
 }
 
+
 // パネルのストアです
-export const usePanelStore = create<embedStore>((set, get) => ({
+//
+// ボタンのラベルを更新する場合は、以下のようにしてください。
+//
+// usePanelStore.getState().updateStore({
+//  button: {
+//    ...usePanelStore.getState().button,
+//    label: '新しいラベル'
+//  }
+// });
+export const usePanelStore = create<embedStore>((set) => ({
+  title: '',
+  description: '',
+  image: null,
+  button: {
+    label: '',
+    style: 'PRIMARY', // 初期値
+    url: '',
+    is_hidden: false,
+  },
+  updateStore: (update) => {
+    set((state) => ({ ...state, ...update }));
+  },
   init: (embedReq: EmbedReq) => {
     set({
       title: embedReq.title,
@@ -28,32 +49,27 @@ export const usePanelStore = create<embedStore>((set, get) => ({
       button: {
         label: embedReq.button[0].label,
         style: embedReq.button[0].style,
+        url: "",
+        is_hidden: false,
       }
-    })
+    });
   },
-  title: "",
-  setTitle: (title: string) => set({ title: title }),
-  description: "",
-  setDescription: (description: string) => set({ description: description }),
-  image: null,
-  setImage: (image: string | File | null) => set({ image: image }),
-  button: { label: "ガチャを回す", style: "PRIMARY" },
-  setButtonLabel: (label: string) => set({
-    button: {
-      label: label || "ガチャを回す",
-      style: get().button.style,
-    }
-  }),
-  setButtonStyle: (style: "PRIMARY" | "SUCCESS") => set({
-    button: {
-      label: get().button.label,
-      style: style || "PRIMARY",
-    }
-  }),
 }));
 
 // Openのストアです
-export const useOpenStore = create<embedStore>((set, get) => ({
+export const useOpenStore = create<embedStore>((set) => ({
+  title: "",
+  description: "",
+  image: null,
+  button: {
+    label: "結果を見る",
+    style: "PRIMARY",
+    url: "",
+    is_hidden: false,
+  },
+  updateStore: (update) => {
+    set((state) => ({ ...state, ...update }));
+  },
   init: (embedReq: EmbedReq) => {
     set({
       title: embedReq?.title || "",
@@ -62,35 +78,24 @@ export const useOpenStore = create<embedStore>((set, get) => ({
       button: {
         label: embedReq.button[0].label,
         style: embedReq.button[0].style,
+        url: "",
+        is_hidden: false,
       }
-    })
+    });
   },
-  title: "",
-  setTitle: (title: string) => set({ title: title }),
-  description: "",
-  setDescription: (description: string) => set({ description: description }),
-  image: null,
-  setImage: (image: string | File | null) => set({ image: image }),
-  button: { label: "結果を見る", style: "PRIMARY" },
-  setButtonLabel: (label: string) => set({
-    button: {
-      label: label || "結果を見る",
-      style: get().button.style,
-    }
-  }),
-  setButtonStyle: (style: "PRIMARY" | "SUCCESS") => set({
-    button: {
-      label: get().button.label,
-      style: style || "PRIMARY",
-    }
-  }),
 }));
 
 // Resultのストアの型です
-export interface resultStore {
+interface resultStore {
   title: string;
   description: string;
   image: string | File | null;
+  button: {
+    label: string;
+    style: ButtonStyle;
+    url: string;
+    is_hidden: boolean;
+  };
   probability: number;
   point: number;
 }
@@ -98,16 +103,16 @@ export interface resultStore {
 interface resultStoreState {
   results: resultStore[];
   init: (resultReqs: ResultReq[]) => void;
-  setTitle: (index: number, title: string) => void;
-  setDescription: (index: number, description: string) => void;
-  setImage: (index: number, image: string | File | null) => void;
-  setProbability: (index: number, probability: number) => void;
-  setPoint: (index: number, point: number) => void;
+  updateStore: (index: number, update: Partial<resultStore>) => void;
   addResult: (newResult: resultStore) => void;
   removeResult: (index: number) => void;
 }
 
 // Resultのstoreです
+//
+// index:0のタイトルを変更する場合は以下のように書きます。
+//
+// useResultStore.getState().updateStore(0, { title: '新しいタイトル' });
 export const useResultStore = create<resultStoreState>((set, get) => ({
   results: [],
   init: (resultReqs: ResultReq[]) => {
@@ -115,46 +120,30 @@ export const useResultStore = create<resultStoreState>((set, get) => ({
       title: req.embed.title,
       description: req.embed.description,
       image: req.embed.image_url,
+      button: {
+        label: req.embed.button?.[0]?.label || "",
+        style: req.embed.button?.[0]?.style,
+        url: req.embed.button?.[0]?.url,
+        is_hidden: req.embed.button?.[0]?.is_hidden,
+      },
       probability: req.probability,
       point: req.point,
     }));
     set({ results: newResults });
   },
-  setTitle: (index: number, title: string) => {
+  updateStore: (index, update) => {
     const newResults = [...get().results];
-    newResults[index].title = title;
+    newResults[index] = { ...newResults[index], ...update };
     set({ results: newResults });
   },
-  setDescription: (index: number, description: string) => {
-    const newResults = [...get().results];
-    newResults[index].description = description;
-    set({ results: newResults });
-  },
-  setImage: (index: number, image: string | File | null) => {
-    const newResults = [...get().results];
-    newResults[index].image = image;
-    set({ results: newResults });
-  },
-  setProbability: (index: number, probability: number) => {
-    const newResults = [...get().results];
-    newResults[index].probability = probability;
-    set({ results: newResults });
-  },
-  setPoint: (index: number, point: number) => {
-    const newResults = [...get().results];
-    newResults[index].point = point;
-    set({ results: newResults });
-  },
-  // 新しいResultを追加する関数
-  addResult: (newResult: resultStore) => {
+  addResult: (newResult) => {
     const currentResults = get().results;
     set({ results: [...currentResults, newResult] });
   },
-  // 特定のIndexのResultを削除する関数
-  removeResult: (index: number) => {
+  removeResult: (index) => {
     const filteredResults = get().results.filter((_, i) => i !== index);
     set({ results: filteredResults });
-  }
+  },
 }));
 
 interface roleStore {
@@ -165,41 +154,32 @@ interface roleStore {
 interface roleStoreState {
   roles: roleStore[];
   init: (roles: roleStore[]) => void;
-  setRoleID: (index: number, role_id: string) => void;
-  setPoint: (index: number, point: number) => void;
-  addRole: (newRole: roleStore) => void
+  updateStore: (index: number, update: Partial<roleStore>) => void;
+  addRole: (newRole: roleStore) => void;
   removeRole: (index: number) => void;
 }
 
 // Roleのstoreです
+//
+// pointを更新する場合は以下のように書きます。
+//
+// useRoleStore.getState().updateStore(0, { point: 100 });
 export const useRoleStore = create<roleStoreState>((set, get) => ({
   roles: [],
   init: (roles: roleStore[]) => {
-    if (!roles) return;
-    const newRoles = roles.map(role => ({
-      id: role.id,
-      point: role.point,
-    }));
-    set({ roles: newRoles });
+    set({ roles: roles });
   },
-  setRoleID: (index: number, role_id: string) => {
+  updateStore: (index, update) => {
     const newRoles = [...get().roles];
-    newRoles[index].id = role_id;
+    newRoles[index] = { ...newRoles[index], ...update };
     set({ roles: newRoles });
   },
-  setPoint: (index: number, point: number) => {
-    const newRoles = [...get().roles];
-    newRoles[index].point = point;
-    set({ roles: newRoles });
+  addRole: (newRole) => {
+    const currentRoles = get().roles;
+    set({ roles: [...currentRoles, newRole] });
   },
-  // 新しいResultを追加する関数
-  addRole: (newRole: roleStore) => {
-    const currentResults = get().roles;
-    set({ roles: [...currentResults, newRole] });
-  },
-  // 特定のIndexのResultを削除する関数
-  removeRole: (index: number) => {
+  removeRole: (index) => {
     const filteredRoles = get().roles.filter((_, i) => i !== index);
     set({ roles: filteredRoles });
-  }
+  },
 }));

@@ -1,22 +1,19 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Box, Center, HStack, IconButton, Image, Input, Textarea, VStack } from '@chakra-ui/react';
-import ButtonDrawer from "@/components/embed/ButtonDrawer";
 import { FaTrashAlt } from "react-icons/fa";
-import { ButtonStyle } from "@/utils/api/body";
-import PointCheckButtonDrawer from "@/components/embed/PointCheckButtonDrawer";
 
 type Props = {
+  // タイトル
   title: string;
   setTitle: (title: string) => void;
+  // 説明
   description: string;
   setDescription: (description: string) => void;
+  // 画像
   file: string | File | null;
   setFile: (file: File | null) => void;
-  buttonLabel?: string;
-  setButtonLabel?: (buttonLabel: string) => void;
-  buttonStyle?: ButtonStyle;
-  setButtonStyle?: (buttonColor: ButtonStyle) => void;
-  isPanel?: boolean;
+  // ボタン
+  buttons: ReactNode[];
 }
 
 /**
@@ -118,19 +115,13 @@ function DiscordEmbedUI(props: Props) {
           )}
         </Box>
 
-        {props.buttonLabel && props.buttonStyle && (
-          <HStack justifyContent="flex-start" spacing={4}>
-            <ButtonDrawer
-              label={props.buttonLabel}
-              setLabel={(label) => props.setButtonLabel!(label)}
-              style={props.buttonStyle}
-              setStyle={(color) => props.setButtonStyle!(color)}
-            />
-            {props.isPanel && (
-              <PointCheckButtonDrawer/>
-            )}
-          </HStack>
-        )}
+        <HStack justifyContent="flex-start" spacing={4}>
+          {props.buttons.map((buttonComponent, index) =>
+            <React.Fragment key={index}>
+              {buttonComponent}
+            </React.Fragment>
+          )}
+        </HStack>
       </VStack>
     </Box>
   );
