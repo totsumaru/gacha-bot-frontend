@@ -5,7 +5,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
 
 type Props = {
-  serverId: string
+  serverId?: string
 }
 
 export default function LoginButton({ serverId }: Props) {
@@ -19,7 +19,9 @@ export default function LoginButton({ serverId }: Props) {
         provider: 'discord',
         options: {
           scopes: "guilds",
-          redirectTo: `${process.env.NEXT_PUBLIC_FE_URL}/auth/callback?server_id=${serverId}`
+          redirectTo: serverId
+            ? `${process.env.NEXT_PUBLIC_FE_URL}/auth/callback?server_id=${serverId}`
+            : `${process.env.NEXT_PUBLIC_FE_URL}/admin/servers`
         }
       });
       if (error) {
