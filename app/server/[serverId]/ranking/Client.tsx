@@ -20,7 +20,7 @@ export default function Client(props: Props) {
   return (
     <Container maxW="xl" centerContent py={10}>
       <Heading mb={2} color="white">
-        👑 Ranking 👑
+        👑 ランキング 👑
       </Heading>
       <Text textColor={"white"} mb={6}>
         上位100位が表示されます。
