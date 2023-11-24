@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Box, Center, HStack, IconButton, Image, Input, Textarea, VStack } from '@chakra-ui/react';
 import { FaTrashAlt } from "react-icons/fa";
 
@@ -24,6 +24,12 @@ function DiscordEmbedUI(props: Props) {
   const borderColor = 'gray.600';
   const textColor = 'gray.100'; // 明るいテキストカラー
   const placeholderColor = 'gray.500'; // プレースホルダーのカラー
+  const [rows, setRows] = useState(3); // 初期行数は3行
+
+  useEffect(() => {
+    const lineCount = props.description.split('\n').length;
+    setRows(Math.max(3, lineCount)); // 入力行数に応じて行数を更新
+  }, [props.description]);
 
   // 画像を変更します
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +69,7 @@ function DiscordEmbedUI(props: Props) {
           bg={bg}
           _placeholder={{ color: placeholderColor }}
           _hover={{ bg: 'gray.700' }} // hover時の背景色を追加
+          rows={rows}
         />
 
         {/* Image Upload and Display */}
