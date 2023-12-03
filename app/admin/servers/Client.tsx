@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import { Badge, Container, Flex, Image, Spacer, Text, VStack, } from '@chakra-ui/react';
+import { Badge, Box, Container, Flex, Image, Spacer, Text, VStack, } from '@chakra-ui/react';
 
 type Props = {
   servers: {
@@ -50,7 +50,10 @@ export default function Client(props: Props) {
               alt={`Avatar of ${server.name}`}
               mr={4}
             />
-            <Text fontWeight="bold">{server.name}</Text>
+            <Box>
+              <Text fontWeight="bold">{server.name}</Text>
+              <Text fontSize="sm" color="gray.500">{server.id}</Text>
+            </Box>
             <Spacer/>
             <Image
               borderRadius="full"
