@@ -1,11 +1,11 @@
-type RankingItem = {
+export type RankingItem = {
   user_name: string;
   avatar_url: string;
   point: number;
   rank: number;
 };
 
-type Res = RankingItem[];
+export type Res = RankingItem[];
 
 type Props = {
   serverId: string;

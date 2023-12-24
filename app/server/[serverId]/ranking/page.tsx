@@ -1,5 +1,4 @@
 import Client from "@/app/server/[serverId]/ranking/Client";
-import { getRanking } from "@/utils/api/get_ranking";
 import React from "react";
 import { Box } from "@chakra-ui/react";
 
@@ -9,10 +8,6 @@ export default async function Index({
   params: { serverId: string }
 }) {
   try {
-    const userDatas = await getRanking({
-      serverId: serverId,
-    })
-
     return (
       <Box
         style={{
@@ -20,7 +15,7 @@ export default async function Index({
         }}
         minH="100vh"
       >
-        <Client users={userDatas}/>
+        <Client serverId={serverId}/>
       </Box>
     )
   } catch (e) {
