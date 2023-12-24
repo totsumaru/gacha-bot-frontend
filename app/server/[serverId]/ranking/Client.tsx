@@ -13,13 +13,14 @@ type Props = {
  * ランキングページ
  */
 export default function Client(props: Props) {
-  let userDatas: RankingItem[] = []
+  const [userDatas, setUserDatas] = React.useState<RankingItem[]>([])
   useEffect(() => {
     (async () => {
       try {
-        userDatas = await getRanking({
+        const users = await getRanking({
           serverId: props.serverId,
         })
+        setUserDatas(users)
       } catch (e) {
         console.error(e)
         return (
