@@ -14,7 +14,7 @@ type Props = {
  */
 export default function Client(props: Props) {
   const [userDatas, setUserDatas] = React.useState<RankingItem[]>([])
-  const [loading, setLoading] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
   useEffect(() => {
     (async () => {
       try {
@@ -27,6 +27,8 @@ export default function Client(props: Props) {
         return (
           <>エラーが発生しました</>
         )
+      } finally {
+        setLoading(false)
       }
     })()
   }, [])
