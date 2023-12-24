@@ -1,22 +1,34 @@
 "use client"
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Badge, Container, Flex, Heading, Image, Spacer, Text, VStack, } from '@chakra-ui/react';
+import { getRanking, RankingItem } from "@/utils/api/get_ranking";
 
 // ランキングの項目を表す型
 type Props = {
-  users: {
-    user_name: string;
-    avatar_url: string;
-    point: number;
-    rank: number;
-  }[]
+  serverId: string
 };
 
 /**
  * ランキングページ
  */
 export default function Client(props: Props) {
+  let userDatas: RankingItem[] = []
+  useEffect(() => {
+    (async () => {
+      try {
+        userDatas = await getRanking({
+          serverId: props.serverId,
+        })
+      } catch (e) {
+        console.error(e)
+        return (
+          <>エラーが発生しました</>
+        )
+      }
+    })()
+  }, [])
+
   return (
     <Container maxW="xl" centerContent py={10}>
       <Heading mb={2} color="white">
@@ -26,7 +38,7 @@ export default function Client(props: Props) {
         上位100位が表示されます。
       </Text>
       <VStack spacing={4} align="stretch" w="full">
-        {props.users.map((user) => (
+        {userDatas.map((user) => (
           <Flex
             key={user.user_name}
             p={3}
